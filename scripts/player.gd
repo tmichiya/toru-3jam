@@ -11,6 +11,10 @@ signal walked_by_click  # クリックで歩き出した (操作説明のテロ�
 const WALK_SPEED := 42.0
 const ARRIVE_DIST := 5.0
 const KEY_COLOR := Color("ffd47e")
+## 絵の 1 コマ (15x26) の中で、足元 (体の下端の行 18) が原点に来るようにずらす
+const SPRITE_OFFSET := Vector2(-7, -19)
+## 見た目の体の大きさ (頭のてっぺん〜足元)。吹き出しの高さと、言葉を落とす当たり判定に使う
+const BODY_SIZE := Vector2(7, 12)
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var bubble: Bubble = $Bubble
@@ -34,8 +38,8 @@ var look_scale := 1.0:
 		look_scale = v
 		if sprite:
 			sprite.scale = Vector2(v, v)
-			sprite.position = Vector2(-5, -14) * v
-			bubble.position = Vector2(0, -14 * v - 4)
+			sprite.position = SPRITE_OFFSET * v
+			bubble.position = Vector2(0, -BODY_SIZE.y * v - 4)
 
 
 func setup(g: Game) -> void:
@@ -87,7 +91,7 @@ func room_to_screen(p: Vector2) -> Vector2:
 ## 主人公の見た目上の矩形 (画面座標)。言葉を落とす先の判定に使う
 func body_screen_rect() -> Rect2:
 	var o := get_global_transform_with_canvas().origin
-	return Rect2(o + Vector2(-5, -14) * look_scale, Vector2(10, 14) * look_scale)
+	return Rect2(o + Vector2(-BODY_SIZE.x / 2.0, -BODY_SIZE.y) * look_scale, BODY_SIZE * look_scale)
 
 
 func accepts_drop(screen_p: Vector2) -> bool:
@@ -195,10 +199,10 @@ func _check_spots() -> void:
 
 func _draw() -> void:
 	if _question_t > 0.0:
-		draw_string(UIConst.FONT, Vector2(3, roundf(-14 * look_scale) - 2), "？", HORIZONTAL_ALIGNMENT_LEFT, -1,
+		draw_string(UIConst.FONT, Vector2(3, roundf(-BODY_SIZE.y * look_scale) - 2), "？", HORIZONTAL_ALIGNMENT_LEFT, -1,
 			UIConst.FONT_SIZE, UIConst.TEXT_COLOR)
 	if _has_key or _ended:
 		# 手に持った鍵
 		var side := -1.0 if sprite.flip_h else 1.0
-		for p in [Vector2(6, -6), Vector2(7, -6), Vector2(8, -6), Vector2(8, -5), Vector2(5, -7), Vector2(5, -5), Vector2(4, -6)]:
+		for p in [Vector2(6, -4), Vector2(7, -4), Vector2(8, -4), Vector2(8, -3), Vector2(5, -5), Vector2(5, -3), Vector2(4, -4)]:
 			draw_rect(Rect2(Vector2(p.x * side, p.y), Vector2.ONE), KEY_COLOR)
