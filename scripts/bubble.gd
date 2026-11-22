@@ -57,7 +57,7 @@ func uid_at(screen_p: Vector2) -> int:
 	var msg := game.state.message()
 	var rs := slot_rects()
 	for i in mini(rs.size(), msg.size()):
-		if (rs[i] as Rect2).grow(2.0).has_point(local):
+		if (rs[i] as Rect2).grow(4.0).has_point(local):
 			return msg[i]
 	return -1
 

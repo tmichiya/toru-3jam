@@ -8,6 +8,7 @@ extends Node2D
 const LINE_H := 16.0
 const TITLE_H := 13.0
 const WORD_GAP := 8.0
+const HIT_PAD := 4.0  # 言葉の当たり判定を見た目より広げる (指でもつかみやすく)
 const TYPE_DELAY_PER_WORD := 0.2
 const TYPE_DELAY_PER_LINE := 0.5
 const FIRST_DELAY := 0.3
@@ -115,7 +116,7 @@ func uid_at(p: Vector2, exclude: int = -1) -> int:
 	for pid in game.state.got():
 		for line in game.state.poem_lines(pid):
 			for w in line["words"]:
-				if w["uid"] != exclude and game.state.is_present(w) and get_rect(w["uid"]).grow(3.0).has_point(p):
+				if w["uid"] != exclude and game.state.is_present(w) and get_rect(w["uid"]).grow(HIT_PAD).has_point(p):
 					return w["uid"]
 	return -1
 
