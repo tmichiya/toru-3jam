@@ -16,6 +16,7 @@
 [ext_resource type="Script" path="res://scripts/saturation.gd" id="14_sat"]
 [ext_resource type="Shader" path="res://shaders/saturation.gdshader" id="15_satshader"]
 [ext_resource type="Shader" path="res://shaders/key_dark.gdshader" id="16_key"]
+[ext_resource type="Script" path="res://scripts/intro.gd" id="17_intro"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("4_bgshader")
@@ -91,3 +92,13 @@ script = ExtResource("14_sat")
 
 [node name="SFX" type="Node" parent="."]
 script = ExtResource("9_sfx")
+
+[node name="IntroLayer" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="Intro" type="Control" parent="IntroLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 480.0
+offset_bottom = 270.0
+script = ExtResource("17_intro")

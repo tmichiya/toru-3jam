@@ -4,6 +4,7 @@ extends Node2D
 ##  - World: 部屋の絵・目印・主人公 (部屋の絵のピクセル座標で配置)
 ##  - PoemLayer: 画面上方の詩・演出・入力・UI
 ##  - PostLayer: 画面全体の彩度 (場面が進むほど色づく)
+##  - IntroLayer: はじめの文章 (読み終わると消えてゲームが始まる)
 
 const POEM_PATH := "res://data/poem.json"
 
@@ -17,6 +18,7 @@ const POEM_PATH := "res://data/poem.json"
 @onready var ui: GameUI = $PoemLayer/UI
 @onready var saturation: SaturationPost = $PostLayer/Saturation
 @onready var sfx: Sfx = $SFX
+@onready var intro: Intro = $IntroLayer/Intro
 
 
 func _ready() -> void:
@@ -30,3 +32,4 @@ func _ready() -> void:
 	input_ctrl.setup(game, poem_view, player, ui)
 	saturation.setup(game)
 	sfx.setup(game)
+	intro.setup(game.poem.get("intro", []))
