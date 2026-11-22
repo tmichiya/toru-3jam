@@ -12,6 +12,8 @@ const LIGHT := Color("fff1b0")
 
 const TINT := 0.45  # 部屋の線を今の色にどれだけ染めるか
 const ROOM_FADE_TIME := 2.5
+const GLOW_RADIUS := 30.0    # 扉のまわりの光の広さ
+const GLOW_STRENGTH := 0.75  # 光の濃さ (中心)
 
 var game: Game
 var _room_shown := true
@@ -67,13 +69,34 @@ func _draw() -> void:
 				for p in sp["points"]:
 					_draw_arrow(Vector2(p[0], p[1] - 22))
 	if _open > 0.0:
-		var r: Array = game.poem.get("door_light", [227, 88, 16, 17])
-		var rect := Rect2(r[0], r[1], r[2], r[3])
-		draw_rect(rect, Color(LIGHT, _open))
-		for i in 14:
-			var a := TAU * i / 14.0 + _t * 0.3
-			var dist := 10.0 + _open * 22.0 + sin(_t * 3.0 + i) * 3.0
-			draw_rect(Rect2((rect.get_center() + Vector2.from_angle(a) * dist).round(), Vector2.ONE), Color(LIGHT, _open))
+		_draw_door_glow()
+
+
+## 扉のまわりがやわらかく明るくなる光。中心ほど濃い、ディザの点で描く (扉そのものは隠さない)
+func _draw_door_glow() -> void:
+	var r: Array = game.poem.get("door_light", [227, 88, 16, 17])
+	var center := Rect2(r[0], r[1], r[2], r[3]).get_center()
+	var radius := GLOW_RADIUS * (0.6 + 0.4 * _open) + sin(_t * 1.5) * 1.5
+	var shift := int(_t * 2.0)  # 点の並びがゆっくりゆらぐ
+	for dy in range(-int(radius), int(radius) + 1):
+		for dx in range(-int(radius), int(radius) + 1):
+			var d := Vector2(dx, dy).length() / radius
+			if d >= 1.0:
+				continue
+			var strength := _open * pow(1.0 - d, 1.6) * GLOW_STRENGTH
+			if _bayer(dx + shift, dy) < strength:
+				draw_rect(Rect2(center + Vector2(dx, dy), Vector2.ONE), Color(LIGHT, 0.35 + 0.4 * (1.0 - d)))
+	# 扉からふわりと昇る光の粒
+	for i in 8:
+		var k := fmod(_t * 0.25 + i / 8.0, 1.0)
+		var p := center + Vector2(sin(i * 2.3 + _t) * 9.0, 8.0 - k * 34.0)
+		if k < 0.85:
+			draw_rect(Rect2(p.round(), Vector2.ONE), Color(LIGHT, _open * (1.0 - k)))
+
+
+func _bayer(x: int, y: int) -> float:
+	const M := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+	return (M[posmod(x, 4) + posmod(y, 4) * 4] + 0.5) / 16.0
 
 
 ## 点線の枠。点が流れるように動く
