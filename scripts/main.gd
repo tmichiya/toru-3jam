@@ -33,3 +33,8 @@ func _ready() -> void:
 	saturation.setup(game)
 	sfx.setup(game)
 	intro.setup(game.poem.get("intro", []))
+	# スマホを縦にしているときの案内 (いちばん上に重ねる)
+	var notice_layer := CanvasLayer.new()
+	notice_layer.layer = 30
+	add_child(notice_layer)
+	notice_layer.add_child(OrientationNotice.new())
