@@ -163,6 +163,11 @@ func _on_fx(ev: Dictionary) -> void:
 	match ev["kind"]:
 		"collect":
 			select_page(ev["poem"])
+		"ending":
+			# エンディングの文と重ならないよう、詩はそっと消える
+			create_tween().tween_property(self, "modulate:a", 0.0, 1.5).set_delay(1.5)
+		"undo":
+			modulate.a = 1.0
 		"transform":
 			for uid in ev["uids"]:
 				if _nodes.has(uid):

@@ -10,6 +10,7 @@ var player: Player
 var view: PoemView
 
 var _hint_label: Label
+var _help_label: Label
 var _ending_label: Label
 var _tell_button: Button
 var _tabs: Dictionary = {}  # 詩の id -> Button
@@ -22,9 +23,9 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_label = _make_label("", Vector2(MARGIN, 254))
 	_hint_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
-	var help := _make_label("「逆さ」「ずれる」は ことばに かさねる", Vector2(MARGIN, 240))
-	help.modulate.a = 0.55
-	_ending_label = _make_label("", Vector2(0, 60))
+	_help_label = _make_label("逆さ・ずれる は ことばに かさねる", Vector2(MARGIN, 240))
+	_help_label.modulate.a = 0.55
+	_ending_label = _make_label("", Vector2(0, 40))
 	_ending_label.size = Vector2(UIConst.SCREEN.x, 16)
 	_ending_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_ending_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
@@ -52,6 +53,7 @@ func _refresh() -> void:
 		create_tween().tween_property(_hint_label, "visible_ratio", 1.0, 0.05 * h.length())
 	_tell_button.disabled = game.state.message().is_empty()
 	_tell_button.visible = game.capacity() > 0
+	_help_label.visible = not game.state.d["ended"]
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
 	_refresh_tabs()

@@ -2,7 +2,7 @@ class_name SaturationPost
 extends ColorRect
 ## 画面全体の彩度を場面の進みに合わせて上げる (はじめはグレイスケール)。
 
-const FADE_TIME := 2.5
+const FADE_TIME := 1.6
 
 var game: Game
 var _mat: ShaderMaterial
@@ -18,10 +18,14 @@ func setup(g: Game) -> void:
 	_mat.set_shader_parameter("saturation", _value)
 
 
+## 場面の彩度 + 色の言葉を選んでいる間は color_boost だけ色が濃くなる
 func _target() -> float:
 	if game.state.d["ended"]:
 		return 1.0
-	return float(game.stage_def().get("saturation", 0.0))
+	var v := float(game.stage_def().get("saturation", 0.0))
+	if game.state.d["color"] != "gray":
+		v += float(game.poem.get("color_boost", 0.0))
+	return clampf(v, 0.0, 1.0)
 
 
 func _apply() -> void:

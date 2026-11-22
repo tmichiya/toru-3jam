@@ -3,22 +3,31 @@ extends Node2D
 ## 部屋の絵の上に重ねる小さな演出。
 ##  - 開いていて詩が残っている本棚・窓に、きらきらした目印
 ##  - エンディングで扉が開き、光がこぼれる
+##  - 部屋の線を今の色 (色の言葉) に染める
 ## 座標は部屋の絵のピクセル座標。
 
 const MARK_COLOR := Color("fff1a0")
 const LIGHT := Color("fff1b0")
 
+const TINT := 0.45  # 部屋の線を今の色にどれだけ染めるか
+
 var game: Game
+var _tinted: Array = []  # 今の色に染める CanvasItem (部屋の絵)
 var _t := 0.0
 var _open := 0.0
 
 
-func setup(g: Game) -> void:
+func setup(g: Game, tinted: Array) -> void:
 	game = g
+	_tinted = tinted
 	g.state_changed.connect(_apply)
+	_apply()
 
 
 func _apply() -> void:
+	var c := Color.WHITE.lerp(game.palette_color(game.state.d["color"], 0), TINT)
+	for item in _tinted:
+		create_tween().tween_property(item, "modulate", c, 1.0)
 	var target := 1.0 if game.state.d["ended"] else 0.0
 	if not is_equal_approx(target, _open):
 		var tw := create_tween()

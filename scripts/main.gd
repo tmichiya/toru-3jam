@@ -24,7 +24,7 @@ const POEM_PATH := "res://data/poem.json"
 func _ready() -> void:
 	game.load_poem(POEM_PATH)
 	background.setup(game, poem_view)
-	props.setup(game)
+	props.setup(game, [$World/RoomBG, $World/Room])
 	player.setup(game)
 	poem_view.setup(game)
 	fx.setup(game, poem_view, player)
