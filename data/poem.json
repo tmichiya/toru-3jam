@@ -267,5 +267,6 @@
 	],
 	"color_boost": 0.35,
 	"exit": "door",
-	"ending_text": "きらきらした 明るい 未来へ、きみは 扉を あけた。"
+	"ending_title": "きらきらした 明るい 未来へ",
+	"ending_text": "きみは 扉を あけて、外へ あるきだした。"
 }
