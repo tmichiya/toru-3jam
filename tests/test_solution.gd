@@ -12,13 +12,11 @@ func _init() -> void:
 	game.load_poem("res://data/poem.json")
 	_test_nav()
 
-	# 1. 泣いている: 赤で 逆さ が見え、涙を逆さにして 笑顔
+	# 1. 泣いている: 涙を逆さにして 笑顔
 	_check(game.state.got() == ["p1"], "最初から 詩一 を持っている")
 	game.arrive("shelf_left")
 	_check(game.state.got() == ["p1"], "まだ開いていない本棚からは手に入らない")
-	_check(not game.apply_tool(_uid("逆さ"), _uid("涙")), "赤の前は 逆さ が見えない")
-	game.click(_uid("赤い"))
-	_check(not game.apply_tool(_uid("逆さ"), _uid("部屋")), "部屋 は逆さにできない")
+	_check(not game.apply_tool(_uid("逆さ"), _uid("逆さ")), "逆さ そのものは逆さにできない")
 	_check(game.apply_tool(_uid("逆さ"), _uid("涙")), "涙 を逆さにする")
 	_check(_uid("笑顔") > 0 and _uid("涙") < 0, "涙 が 笑顔 に変わる")
 	game.give(_uid("笑顔"))
@@ -30,8 +28,9 @@ func _init() -> void:
 	game.arrive("bed")
 	_check(game.stage_def()["id"] == "sleep", "ベッドで眠る")
 
-	# 3. 寝ている: 青で ずれる が見え、夜 → 朝。詩一の 笑顔 と合わせる
-	game.click(_uid("青い"))
+	# 3. 寝ている: 詩一の 赤い で 詩二の ずれる が見え、夜 → 朝。詩一の 笑顔 と合わせる
+	_check(not game.state.is_present(_w("ずれる")), "赤の前は ずれる が見えない")
+	game.click(_uid("赤い"))
 	_check(game.apply_tool(_uid("ずれる"), _uid("夜")) and _uid("朝") > 0, "夜 が ずれて 朝 に")
 	game.give(_uid("やさしい"))
 	game.give(_uid("朝"))
@@ -40,28 +39,42 @@ func _init() -> void:
 	game.give(_uid("笑顔"))
 	_check(game.tell(), "朝 笑顔 (詩二+詩一) で起きる")
 
-	# 4. 扉: 赤で 逆さ を出して なくした → みつけた、金色で 鍵
+	# 4. 扉: 赤で ずれる を出して なくした → さがした → みつけた、詩二の 緑の で 詩三の 鍵
 	game.arrive("shelf_right")
 	_check("p3" in game.state.got(), "右の本棚で 詩三 を手に入れる")
-	game.click(_uid("赤い"))
-	_check(game.apply_tool(_uid("逆さ"), _uid("なくした")), "なくした を逆さにして みつけた")
-	game.click(_uid("金色"))
-	_check(not game.state.is_present(_w("逆さ")), "金色の間は 逆さ は見えない")
+	_check(not game.apply_tool(_uid("逆さ"), _uid("なくした")), "なくした は逆さにできない")
+	_check(game.apply_tool(_uid("ずれる"), _uid("なくした")) and _uid("さがした") > 0, "なくした が ずれて さがした")
+	_check(game.apply_tool(_uid("ずれる"), _uid("さがした")) and _uid("みつけた") > 0, "さがした が ずれて みつけた")
+	_check(not game.state.is_present(_w("鍵")), "緑の前は 鍵 が見えない")
+	game.click(_uid("緑の"))
+	_check(not game.state.is_present(_w("ずれる")), "緑の間は ずれる は見えない")
 	game.give(_uid("鍵"))
 	game.give(_uid("みつけた"))
-	_check(game.tell(), "鍵 みつけた (詩三+詩一の道具) で鍵が見つかる")
+	_check(game.tell(), "鍵 みつけた (詩三+詩二の色+詩二の道具) で鍵が見つかる")
 
-	# 5. 窓: 暗い → 明るい (逆さ)、過去 → 今 → 未来 (ずれる 2回)
+	# どの言葉も変えられる (例: 鳥 → 烏 → 島、部屋 ⇄ 外)
+	game.click(_uid("赤い"))
+	game.apply_tool(_uid("ずれる"), _uid("部屋"))
+	_check(_uid("家") > 0, "部屋 が ずれて 家")
+	game.undo()
+	_check(game.apply_tool(_uid("逆さ"), _uid("部屋")) and _uid("外") > 0, "部屋 を逆さにして 外")
+	game.undo()
+
+	# 5. 窓: 詩四の 白い で 詩二の 明るい が見える。過去 → 今 → 未来 (ずれる 2回)
+	_check(not game.hint().contains("未来」と"), "窓の詩の前は 窓へ行くヒント")
 	game.arrive("window")
 	_check("p4" in game.state.got(), "窓で 詩四 を手に入れる")
+	_check(game.hint().contains("きらきらした 明るい 未来"), "窓の詩を手に入れたら 答えを言うヒント")
+	_check(not game.state.is_present(_w("明るい")), "白の前は 詩二の 明るい が見えない")
+	game.click(_uid("白い"))
+	_check(game.state.is_present(_w("鳥")), "白で 詩三の 鳥 も見える")
+	game.give(_uid("きらきらした"))
+	game.give(_uid("明るい"))
 	game.click(_uid("赤い"))
-	game.apply_tool(_uid("逆さ"), _uid("暗い"))
-	game.click(_uid("青い"))
 	game.apply_tool(_uid("ずれる"), _uid("過去"))
 	_check(_uid("今") > 0, "過去 が ずれて 今")
 	game.apply_tool(_uid("ずれる"), _uid("今"))
-	for t in ["きらきらした", "明るい", "未来"]:
-		game.give(_uid(t))
+	game.give(_uid("未来"))
 	_check(game.tell() and game.state.d["ended"], "きらきらした 明るい 未来 でエンディング")
 
 	game.undo()

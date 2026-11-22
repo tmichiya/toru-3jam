@@ -1,6 +1,6 @@
 class_name GameUI
 extends Control
-## 画面の情報 (場面のヒント・操作説明・伝えるボタン・もどる/やりなおす・エンディング文)。
+## 画面の情報 (場面のヒント・伝えるボタン・もどる/やりなおす・エンディング文)。画面下はヒント1行とボタンだけにする。
 
 const MARGIN := 8.0
 
@@ -9,8 +9,8 @@ var player: Player
 var view: PoemView
 
 var _hint_label: Label
-var _help_label: Label
 var _ending_label: Label
+var _title_label: Label
 var _tell_button: Button
 
 
@@ -21,12 +21,16 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_label = _make_label("", Vector2(MARGIN, 254))
 	_hint_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
-	_help_label = _make_label("どの詩の ことばも つかえる", Vector2(MARGIN, 240))
-	_help_label.modulate.a = 0.55
-	_ending_label = _make_label("", Vector2(0, 40))
+	# 扉を開けるとき、画面上部に大きく出る題 (ドットが崩れないよう 2 倍の大きさ)
+	_title_label = _make_label("", Vector2(0, 10))
+	_title_label.size = Vector2(UIConst.SCREEN.x, 28)
+	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_label.add_theme_font_size_override("font_size", UIConst.FONT_SIZE * 2)
+	_title_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
+	_ending_label = _make_label("", Vector2(0, 44))
 	_ending_label.size = Vector2(UIConst.SCREEN.x, 16)
 	_ending_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ending_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
+	_ending_label.add_theme_color_override("font_color", UIConst.TEXT_COLOR)
 
 	var x := UIConst.SCREEN.x - MARGIN
 	for def in [["やりなおす", game.reset], ["もどる", game.undo]]:
@@ -50,9 +54,9 @@ func _refresh() -> void:
 		create_tween().tween_property(_hint_label, "visible_ratio", 1.0, 0.05 * h.length())
 	_tell_button.disabled = game.state.message().is_empty()
 	_tell_button.visible = game.capacity() > 0
-	_help_label.visible = not game.state.d["ended"]
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
+		_title_label.text = ""
 
 
 ## 伝えるボタンは吹き出しの右にくっついて動く
@@ -64,11 +68,16 @@ func _process(_delta: float) -> void:
 
 func _on_fx(ev: Dictionary) -> void:
 	if ev["kind"] == "ending":
+		# 詩が消えていく中、上に大きく題、そのあと下に一文
+		_title_label.text = game.poem.get("ending_title", "")
+		_title_label.visible_ratio = 0.0
 		_ending_label.text = game.poem.get("ending_text", "")
 		_ending_label.visible_ratio = 0.0
 		var tw := create_tween()
-		tw.tween_interval(3.5)
-		tw.tween_property(_ending_label, "visible_ratio", 1.0, 3.0)
+		tw.tween_interval(1.5)
+		tw.tween_property(_title_label, "visible_ratio", 1.0, 2.5)
+		tw.tween_interval(1.0)
+		tw.tween_property(_ending_label, "visible_ratio", 1.0, 2.5)
 
 
 func _make_label(t: String, p: Vector2) -> Label:
