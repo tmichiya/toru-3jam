@@ -26,8 +26,6 @@ func _init() -> void:
 		await _wait(0.2)
 	await _wait(2.0)
 	_save("0_start")
-	await _walk_to("shelf_bottom")
-	await _wait(2.0)
 	game.click(_uid("赤い"))
 	await _wait(1.5)
 	_save("1_red")
@@ -37,6 +35,8 @@ func _init() -> void:
 	await _wait(1.0)
 	game.give(_uid("笑顔"))
 	game.tell()
+	await _wait(1.2)
+	_save("1_room_appearing")
 	await _wait(2.0)
 	await _walk_to("bed")
 	await _wait(2.5)
@@ -63,7 +63,13 @@ func _init() -> void:
 	game.give(_uid("みつけた"))
 	game.tell()
 	await _wait(2.5)
-	await _walk_to("window")
+	_save("4_window_marked")
+	# 窓そのものをクリックすると、近い階段の上へ歩く
+	player.walk_to_screen(player.room_to_screen(Vector2(161, 90)))
+	for i in 1500:
+		await process_frame
+		if player._path.is_empty():
+			break
 	await _wait(2.0)
 	game.click(_uid("白い"))
 	await _wait(1.8)

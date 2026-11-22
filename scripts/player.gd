@@ -46,7 +46,24 @@ func walk_to_screen(p: Vector2) -> void:
 	if not can_move():
 		return
 	var local := (get_parent() as Node2D).get_global_transform_with_canvas().affine_inverse() * p
+	# 窓などクリックできる範囲 (area) を押したら、そこに一番近い立ち位置へ
+	for spot in game.poem["spots"]:
+		var sp: Dictionary = game.poem["spots"][spot]
+		if sp.has("area"):
+			var a: Array = sp["area"]
+			if Rect2(a[0], a[1], a[2], a[3]).has_point(local):
+				local = _nearest_point(sp["points"])
 	_path = nav.find_path(position, local)
+
+
+## points のうち、主人公から一番近い点
+func _nearest_point(points: Array) -> Vector2:
+	var best := Vector2(points[0][0], points[0][1])
+	for p in points:
+		var v := Vector2(p[0], p[1])
+		if v.distance_to(position) < best.distance_to(position):
+			best = v
+	return best
 
 
 ## 部屋の絵の座標 → 画面座標
