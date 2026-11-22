@@ -1,0 +1,205 @@
+extends SceneTree
+## 主人公の仮ドット絵 (スプライトシート) と SpriteFrames を生成する。
+## godot --headless --path . -s res://tools/gen_player_placeholder.gd
+##
+## 生成物:
+##   art/player/player_sheet.png   1コマ 16x24、行 = アニメ、列 = コマ (ANIMS の順)
+##   art/player/player_frames.tres 上の PNG を切り出した SpriteFrames
+## 差し替えるときは player_sheet.png を同じ並びで描き直せばそのまま反映される。
+## (コマ数やサイズを変えたいときはエディタで player_frames.tres を直接編集してもOK)
+
+const W := 16
+const H := 24
+const COLS := 4
+const OUT_DIR := "res://art/player/"
+
+## [アニメ名, コマ数, fps, ループ]
+const ANIMS := [
+	["idle", 2, 3.0, true],
+	["cry", 2, 4.0, true],
+	["happy", 2, 6.0, true],
+	["sleep", 2, 1.5, true],
+	["wake", 2, 4.0, true],
+	["walk", 4, 8.0, true],
+	["search", 2, 4.0, true],
+	["think", 2, 2.0, true],
+	["tilt", 1, 1.0, true],
+]
+
+const LINE := Color("2b2b33")
+const SKIN := Color("f2ede4")
+const CLOTH := Color("8fa3c8")
+const TEAR := Color("6fb6ff")
+const CHEEK := Color("f0a0a8")
+
+
+func _init() -> void:
+	var img := Image.create(W * COLS, H * ANIMS.size(), false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	for row in ANIMS.size():
+		for f in int(ANIMS[row][1]):
+			_draw_frame(img, Vector2i(f * W, row * H), ANIMS[row][0], f)
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
+	img.save_png(OUT_DIR + "player_sheet.png")
+	_write_frames()
+	print("generated ", OUT_DIR)
+	quit()
+
+
+## アニメとコマ番号から見た目のパラメータを決めて描く
+func _draw_frame(img: Image, o: Vector2i, anim: String, f: int) -> void:
+	var p := {
+		"head": Vector2i.ZERO, "body_dy": 0, "eyes": "open", "mouth": "none",
+		"tears": -1, "legs": 0, "arms": "down", "z": false,
+	}
+	match anim:
+		"idle":
+			p["head"] = Vector2i(0, f)
+		"cry":
+			p["eyes"] = "cry"
+			p["mouth"] = "frown"
+			p["tears"] = f
+			p["head"] = Vector2i(0, 1)
+		"happy":
+			p["eyes"] = "happy"
+			p["mouth"] = "smile"
+			p["body_dy"] = -f
+			p["arms"] = "up" if f == 1 else "down"
+		"sleep":
+			p["eyes"] = "closed"
+			p["head"] = Vector2i(1, 1)
+			p["z"] = f == 1
+		"wake":
+			p["eyes"] = "open" if f == 0 else "closed"
+			p["mouth"] = "o"
+			p["arms"] = "up"
+		"walk":
+			p["legs"] = f + 1
+			p["head"] = Vector2i(0, f % 2)
+		"search":
+			p["eyes"] = "down"
+			p["head"] = Vector2i(f, 2)
+			p["arms"] = "chin" if f == 0 else "down"
+		"think":
+			p["eyes"] = "up"
+			p["arms"] = "chin"
+			p["head"] = Vector2i(0, -f)
+		"tilt":
+			p["head"] = Vector2i(1, 0)
+			p["mouth"] = "o"
+	_figure(img, o, p)
+
+
+func _figure(img: Image, o: Vector2i, p: Dictionary) -> void:
+	var by: int = p["body_dy"]
+	# 脚
+	var legs: Array = [[6, 9], [5, 10], [6, 9], [7, 8], [6, 9]][p["legs"]]
+	for x in legs:
+		for y in range(20, 24):
+			_px(img, o, x, y + (by if y < 22 else 0), LINE)
+	# 胴
+	for y in range(13, 20):
+		for x in range(5, 11):
+			var edge := x == 5 or x == 10 or y == 19
+			_px(img, o, x, y + by, LINE if edge else CLOTH)
+	# 腕
+	match p["arms"]:
+		"down":
+			for y in range(14, 18):
+				_px(img, o, 4, y + by, LINE)
+				_px(img, o, 11, y + by, LINE)
+		"up":
+			for y in range(9, 14):
+				_px(img, o, 3, y + by, LINE)
+				_px(img, o, 12, y + by, LINE)
+		"chin":
+			for y in range(14, 18):
+				_px(img, o, 4, y + by, LINE)
+			_px(img, o, 11, 14 + by, LINE)
+			_px(img, o, 11, 13 + by, LINE)
+			_px(img, o, 10, 11 + by, LINE)
+	# 頭
+	var hc: Vector2i = Vector2i(8, 7) + p["head"] + Vector2i(0, by)
+	for y in range(-5, 6):
+		for x in range(-5, 6):
+			var d := x * x + y * y
+			if d <= 25:
+				_px(img, o, hc.x + x, hc.y + y, LINE if d > 16 else SKIN)
+	# 髪
+	for x in range(-4, 5):
+		_px(img, o, hc.x + x, hc.y - 4, LINE)
+	for x in range(-3, 2):
+		_px(img, o, hc.x + x, hc.y - 3, LINE)
+	# 目
+	var el: Vector2i = hc + Vector2i(-2, 0)
+	var er: Vector2i = hc + Vector2i(2, 0)
+	match p["eyes"]:
+		"open":
+			_px(img, o, el.x, el.y, LINE)
+			_px(img, o, er.x, er.y, LINE)
+		"up":
+			_px(img, o, el.x, el.y - 1, LINE)
+			_px(img, o, er.x, er.y - 1, LINE)
+		"down":
+			_px(img, o, el.x, el.y + 1, LINE)
+			_px(img, o, er.x, er.y + 1, LINE)
+		"closed":
+			for e in [el, er]:
+				_px(img, o, e.x - 1, e.y, LINE)
+				_px(img, o, e.x, e.y, LINE)
+		"happy", "cry":
+			for e in [el, er]:
+				_px(img, o, e.x - 1, e.y + (1 if p["eyes"] == "happy" else 0), LINE)
+				_px(img, o, e.x, e.y + (0 if p["eyes"] == "happy" else 1), LINE)
+	if p["eyes"] == "happy":
+		_px(img, o, el.x - 1, el.y + 2, CHEEK)
+		_px(img, o, er.x + 1, er.y + 2, CHEEK)
+	# 涙
+	if p["tears"] >= 0:
+		for e in [el, er]:
+			_px(img, o, e.x, e.y + 2 + p["tears"], TEAR)
+			_px(img, o, e.x, e.y + 3 + p["tears"], TEAR)
+	# 口
+	var m: Vector2i = hc + Vector2i(0, 3)
+	match p["mouth"]:
+		"smile":
+			_px(img, o, m.x - 1, m.y - 1, LINE)
+			_px(img, o, m.x, m.y, LINE)
+			_px(img, o, m.x + 1, m.y - 1, LINE)
+		"frown":
+			_px(img, o, m.x - 1, m.y, LINE)
+			_px(img, o, m.x, m.y - 1, LINE)
+			_px(img, o, m.x + 1, m.y, LINE)
+		"o":
+			_px(img, o, m.x, m.y, LINE)
+	# 寝息
+	if p["z"]:
+		for q in [Vector2i(12, 0), Vector2i(13, 0), Vector2i(14, 0), Vector2i(13, 1), Vector2i(12, 2), Vector2i(13, 2), Vector2i(14, 2)]:
+			_px(img, o, q.x, q.y, LINE)
+
+
+func _px(img: Image, o: Vector2i, x: int, y: int, c: Color) -> void:
+	if x < 0 or x >= W or y < 0 or y >= H:
+		return
+	img.set_pixel(o.x + x, o.y + y, c)
+
+
+func _write_frames() -> void:
+	var subs := ""
+	var anims := []
+	for row in ANIMS.size():
+		var a: Array = ANIMS[row]
+		var frames := []
+		for f in int(a[1]):
+			var id := "at_%s_%d" % [a[0], f]
+			subs += "[sub_resource type=\"AtlasTexture\" id=\"%s\"]\natlas = ExtResource(\"1_sheet\")\nregion = Rect2(%d, %d, %d, %d)\n\n" % [id, f * W, row * H, W, H]
+			frames.append("{\n\"duration\": 1.0,\n\"texture\": SubResource(\"%s\")\n}" % id)
+		anims.append("{\n\"frames\": [%s],\n\"loop\": %s,\n\"name\": &\"%s\",\n\"speed\": %.1f\n}" % [
+			", ".join(frames), "true" if a[3] else "false", a[0], a[2]])
+	var txt := "[gd_resource type=\"SpriteFrames\" format=3]\n\n"
+	txt += "[ext_resource type=\"Texture2D\" path=\"%splayer_sheet.png\" id=\"1_sheet\"]\n\n" % OUT_DIR
+	txt += subs
+	txt += "[resource]\nanimations = [%s]\n" % ", ".join(anims)
+	var f := FileAccess.open(OUT_DIR + "player_frames.tres", FileAccess.WRITE)
+	f.store_string(txt)
+	f.close()
