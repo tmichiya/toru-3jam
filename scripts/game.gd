@@ -101,7 +101,7 @@ func click(uid: int) -> void:
 	_commit(evs)
 
 
-## 道具の言葉 (逆さ・ずれる) を詩の言葉に重ねたとき、何に変わるか。変わらなければ ""
+## 道具の言葉 (逆さ・ずれる・色) を詩の言葉に重ねたとき、何に変わるか。変わらなければ ""
 func tool_result(tool_uid: int, target_uid: int) -> String:
 	var tool_w := state.word_by_uid(tool_uid)
 	var target := state.word_by_uid(target_uid)
@@ -115,6 +115,12 @@ func tool_result(tool_uid: int, target_uid: int) -> String:
 			table = poem.get("opposites", {})
 		"shift":
 			table = poem.get("shifts", {})
+		"mix":
+			# 色 + 色 → 混ざった色 (どちらの順でも同じ)
+			var mixes: Dictionary = poem.get("mixes", {})
+			var a: String = tool_w["key"]
+			var b: String = target["key"]
+			return str(mixes.get("%s+%s" % [a, b], mixes.get("%s+%s" % [b, a], "")))
 	return str(table.get(target["key"], ""))
 
 
