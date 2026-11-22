@@ -29,7 +29,7 @@ func _ready() -> void:
 	poem_view.setup(game)
 	fx.setup(game, poem_view, player)
 	ui.setup(game, player, poem_view)
-	input_ctrl.setup(game, poem_view, player, ui)
+	input_ctrl.setup(game, poem_view, player)
 	saturation.setup(game)
 	sfx.setup(game)
 	intro.setup(game.poem.get("intro", []))

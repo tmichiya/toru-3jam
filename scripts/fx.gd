@@ -41,11 +41,12 @@ func _on_fx(ev: Dictionary) -> void:
 				if node:
 					anims.play(ev["anim"], node, self, view.get_rect(uid))
 		"collect":
-			# 本棚から詩が舞い上がって、左上のしおりへ
+			# 本棚から詩が舞い上がって、その詩が並ぶ場所へ
 			var m: Array = game.poem["spots"][ev["spot"]].get("mark", game.poem["spots"][ev["spot"]]["points"][0])
 			var from := player.room_to_screen(Vector2(m[0], m[1]))
+			var dest: Array = game.poem.get("poem_layout", {}).get(ev["poem"], [240, 20])
 			for i in 24:
-				var to := Vector2(12, 8)
+				var to := Vector2(dest[0], dest[1] + 20)
 				add(from, (to - from) * randf_range(1.2, 1.8) + Vector2(randf_range(-30, 30), randf_range(-30, 30)),
 					randf_range(0.6, 1.0), UIConst.HILITE_COLOR, {"star": i % 3 == 0, "drag": 2.0, "delay": i * 0.02})
 			ring(from, Color.WHITE, 24, 50.0)
