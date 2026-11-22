@@ -3,6 +3,7 @@ extends Control
 ## 画面の情報 (場面のヒント・伝えるボタン・もどる/やりなおす・エンディング文)。画面下はヒント1行とボタンだけにする。
 
 const MARGIN := 8.0
+const MOVE_TELOP_DELAY := 1.0
 
 var game: Game
 var player: Player
@@ -12,6 +13,8 @@ var _hint_label: Label
 var _ending_label: Label
 var _title_label: Label
 var _tell_button: Button
+var _telop: Label
+var _telop_done := false
 
 
 func setup(g: Game, p: Player, v: PoemView) -> void:
@@ -40,6 +43,12 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 		x -= 6.0
 	_tell_button = _make_button("伝える", game.tell)
 	_tell_button.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
+	# 操作のテロップ (部屋の上、詩のあいだの空いたところ)
+	_telop = _make_label("クリックで その位置まで 移動", Vector2(0, 44))
+	_telop.size = Vector2(UIConst.SCREEN.x, 16)
+	_telop.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_telop.visible = false
+	p.walked_by_click.connect(_hide_move_telop)
 
 	g.state_changed.connect(_refresh)
 	g.fx_requested.connect(_on_fx)
@@ -59,8 +68,9 @@ func _refresh() -> void:
 		_title_label.text = ""
 
 
-## 伝えるボタンは吹き出しの右にくっついて動く
+## 伝えるボタンは吹き出しの右にくっついて動く。歩けるようになったら移動のテロップを出す
 func _process(_delta: float) -> void:
+	_update_move_telop()
 	if _tell_button.visible:
 		var r := player.bubble.screen_rect()
 		_tell_button.position = Vector2(r.end.x + 2, r.position.y + (r.size.y - _tell_button.size.y) / 2.0).round()
@@ -78,6 +88,25 @@ func _on_fx(ev: Dictionary) -> void:
 		tw.tween_property(_title_label, "visible_ratio", 1.0, 2.5)
 		tw.tween_interval(1.0)
 		tw.tween_property(_ending_label, "visible_ratio", 1.0, 2.5)
+
+
+## 主人公が歩けるようになったら (部屋が現れたあと)「クリックでその位置まで移動」と出す。
+## 一度クリックで歩いたら消える
+func _update_move_telop() -> void:
+	if _telop_done or _telop.visible or not player.can_move():
+		return
+	_telop.visible = true
+	_telop.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_interval(MOVE_TELOP_DELAY)
+	tw.tween_property(_telop, "modulate:a", 1.0, 0.8)
+
+
+func _hide_move_telop() -> void:
+	if _telop_done:
+		return
+	_telop_done = true
+	create_tween().tween_property(_telop, "modulate:a", 0.0, 0.6)
 
 
 func _make_label(t: String, p: Vector2) -> Label:

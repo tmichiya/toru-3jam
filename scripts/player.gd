@@ -6,6 +6,8 @@ extends Node2D
 ## 見た目は子の AnimatedSprite2D (art/player/player_frames.tres) を差し替えればよい。
 ## 座標は部屋の絵のピクセル座標 (親の World が画面上の位置へずらしている)。
 
+signal walked_by_click  # クリックで歩き出した (操作説明のテロップを消すのに使う)
+
 const WALK_SPEED := 42.0
 const ARRIVE_DIST := 5.0
 const KEY_COLOR := Color("ffd47e")
@@ -64,6 +66,7 @@ func walk_to_screen(p: Vector2) -> void:
 			if Rect2(a[0], a[1], a[2], a[3]).has_point(local):
 				local = _nearest_point(sp["points"])
 	_path = nav.find_path(position, local)
+	walked_by_click.emit()
 
 
 ## points のうち、主人公から一番近い点
