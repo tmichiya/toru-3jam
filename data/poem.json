@@ -15,7 +15,11 @@
 		"green": ["#9fe0a0", "#1f5a4a"],
 		"purple": ["#c9a0ff", "#3d2266"],
 		"gold": ["#ffd47e", "#c8603a"],
-		"white": ["#ffffff", "#a8b8d8"]
+		"white": ["#ffffff", "#a8b8d8"],
+		"black": ["#3a3a4a", "#08080e"],
+		"pink": ["#ffb0d8", "#a0407a"],
+		"lightblue": ["#c4f2ff", "#3a7aa8"],
+		"orange": ["#ffb070", "#a84020"]
 	},
 
 	"comment_lexicon": "言葉ごとの演出 (anim)・効果 (effect: color)・道具 (tool: reverse=逆さ / shift=ずれる)。詩はここにある言葉を並べるだけ",
@@ -27,6 +31,10 @@
 		"紫の": { "anim": "paint", "effect": "color", "arg": "purple" },
 		"金色": { "anim": "paint", "effect": "color", "arg": "gold" },
 		"白い": { "anim": "paint", "effect": "color", "arg": "white" },
+		"黒い": { "anim": "paint", "effect": "color", "arg": "black" },
+		"桃色": { "anim": "paint", "effect": "color", "arg": "pink" },
+		"水色": { "anim": "paint", "effect": "color", "arg": "lightblue" },
+		"橙色": { "anim": "paint", "effect": "color", "arg": "orange" },
 		"逆さ": { "anim": "flip", "tool": "reverse" },
 		"ずれる": { "anim": "slide", "tool": "shift" },
 		"部屋": { "anim": "town" },
@@ -111,7 +119,7 @@
 		"川": "山", "山": "川",
 		"雲": "晴れ", "晴れ": "雲",
 		"きらきらした": "どんよりした", "どんよりした": "きらきらした",
-		"灰色": "白い", "白い": "灰色"
+		"白い": "黒い", "黒い": "白い"
 	},
 	"comment_shifts": "ずれる を重ねると、ひとつ先へずれる (輪になっている)。意味のずれ (朝→昼) と、形のずれ (鳥→烏→島) がある",
 	"shifts": {
@@ -130,7 +138,21 @@
 		"光": "炎", "炎": "星",
 		"夢": "眠る", "眠る": "夢",
 		"赤い": "金色", "金色": "緑の", "緑の": "青い", "青い": "紫の", "紫の": "赤い",
-		"灰色": "白い", "白い": "灰色"
+		"灰色": "白い", "白い": "灰色",
+		"桃色": "水色", "水色": "橙色", "橙色": "桃色"
+	},
+	"comment_mixes": "色の言葉を別の色の言葉に重ねると混ざる (重ねられた側がこの色に変わる。順番はどちらでもよい)",
+	"mixes": {
+		"赤い+白い": "桃色",
+		"青い+白い": "水色",
+		"赤い+金色": "橙色",
+		"青い+金色": "緑の",
+		"赤い+青い": "紫の",
+		"白い+黒い": "灰色",
+		"赤い+緑の": "金色",
+		"紫の+白い": "桃色",
+		"緑の+白い": "水色",
+		"金色+白い": "橙色"
 	},
 
 	"comment_coords": "座標はすべて部屋の絵 (art/room/room.png, 300x300) のピクセル座標。y は足元 (床の上面)",
@@ -180,7 +202,7 @@
 			"lines": [
 				["灰色", "部屋", "ひとり"],
 				["赤い", "涙", "逆さ"],
-				[{ "t": "ぬくもり", "visible_in": "purple" }, { "t": "風", "visible_in": "white" }]
+				[{ "t": "ぬくもり", "visible_in": "purple" }, { "t": "風", "visible_in": "white" }, { "t": "影", "visible_in": "black" }]
 			]
 		},
 		{
@@ -188,7 +210,7 @@
 			"lines": [
 				["青い", "夜", { "t": "ずれる", "visible_in": "red" }],
 				["やさしい", "声", "眠る"],
-				["緑の", { "t": "夢", "visible_in": "gold" }, { "t": "明るい", "visible_in": "white" }]
+				["緑の", { "t": "夢", "visible_in": "gold" }, { "t": "明るい", "visible_in": "lightblue" }]
 			]
 		},
 		{
@@ -202,8 +224,8 @@
 		{
 			"id": "p4", "title": "四",
 			"lines": [
-				["きらきらした", "星", "窓"],
-				["暗い", "過去", { "t": "歌", "visible_in": "red" }],
+				[{ "t": "きらきらした", "visible_in": "pink" }, "星", "窓"],
+				[{ "t": "暗い", "visible_in": "orange" }, { "t": "過去", "visible_in": "black" }, { "t": "歌", "visible_in": "red" }],
 				["白い", { "t": "川", "visible_in": "blue" }]
 			]
 		}
@@ -257,6 +279,7 @@
 			"id": "future",
 			"hint": "窓の 星が よんでいる。窓を クリック",
 			"hint_after": "「きらきらした 明るい 未来」と 伝えよう",
+			"telop_after": "色に 色を かさねると、まざる",
 			"unlock": ["window"],
 			"capacity": 3,
 			"answers": [["きらきらした", "明るい", "未来"]],

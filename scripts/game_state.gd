@@ -54,6 +54,9 @@ static func set_text(w: Dictionary, t: String, lexicon: Dictionary) -> void:
 	w["effect"] = lex.get("effect", "")
 	w["arg"] = lex.get("arg", null)
 	w["tool"] = lex.get("tool", "")
+	# 色の言葉は、別の色の言葉に重ねると混ざる道具にもなる
+	if w["tool"] == "" and w["effect"] == "color":
+		w["tool"] = "mix"
 
 
 func snapshot() -> Dictionary:
