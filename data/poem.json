@@ -173,43 +173,43 @@
 		"focus": [240, 34]
 	},
 
-	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉",
+	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉。見える色は、たいてい別の詩 (あとで手に入る詩) の色の言葉にしてある",
 	"poems": [
 		{
 			"id": "p1", "title": "一",
 			"lines": [
 				["灰色", "部屋", "ひとり"],
-				["赤い", "涙", { "t": "逆さ", "visible_in": "red" }],
-				[{ "t": "ぬくもり", "visible_in": "red" }, { "t": "風", "visible_in": "green" }]
+				["赤い", "涙", "逆さ"],
+				[{ "t": "ぬくもり", "visible_in": "purple" }, { "t": "風", "visible_in": "white" }]
 			]
 		},
 		{
 			"id": "p2", "title": "二",
 			"lines": [
-				["青い", "夜", { "t": "ずれる", "visible_in": "blue" }],
+				["青い", "夜", { "t": "ずれる", "visible_in": "red" }],
 				["やさしい", "声", "眠る"],
-				["緑の", { "t": "夢", "visible_in": "green" }, { "t": "雲", "visible_in": "blue" }]
+				["緑の", { "t": "夢", "visible_in": "gold" }, { "t": "明るい", "visible_in": "white" }]
 			]
 		},
 		{
 			"id": "p3", "title": "三",
 			"lines": [
 				["紫の", "扉", "閉じる"],
-				["なくした", { "t": "鍵", "visible_in": "gold" }],
-				["金色", "光", { "t": "鳥", "visible_in": "purple" }]
+				["なくした", { "t": "鍵", "visible_in": "green" }],
+				["金色", "光", { "t": "鳥", "visible_in": "white" }]
 			]
 		},
 		{
 			"id": "p4", "title": "四",
 			"lines": [
 				["きらきらした", "星", "窓"],
-				["暗い", "過去", { "t": "歌", "visible_in": "white" }],
-				["白い", { "t": "川", "visible_in": "purple" }, { "t": "明るい", "visible_in": "white" }]
+				["暗い", "過去", { "t": "歌", "visible_in": "red" }],
+				["白い", { "t": "川", "visible_in": "blue" }]
 			]
 		}
 	],
 
-	"comment_stages": "unlock = その場面で開く本棚/窓。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
+	"comment_stages": "unlock = その場面で開く本棚/窓 (そこの詩を手に入れたら hint_after のヒントに変わる)。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
 	"stages": [
 		{
 			"id": "cry",
@@ -226,7 +226,7 @@
 		},
 		{
 			"id": "sleepy",
-			"hint": "なきつかれて ねむそう。ベッドへ つれていこう",
+			"hint": "ねむそう。ベッドへ つれていこう",
 			"unlock": ["shelf_left"],
 			"capacity": 0,
 			"reach": "bed",
@@ -235,7 +235,7 @@
 		},
 		{
 			"id": "sleep",
-			"hint": "ねむってしまった。夜を ずらして、朝の 笑顔で おこそう",
+			"hint": "夜を ずらして、朝の 笑顔で おこそう",
 			"capacity": 2,
 			"answers": [["朝", "笑顔"], ["笑顔", "朝"]],
 			"saturation": 0.3,
@@ -245,7 +245,7 @@
 		},
 		{
 			"id": "door",
-			"hint": "扉が 閉じている。なくした 鍵を みつけよう",
+			"hint": "なくした 鍵を みつけよう",
 			"unlock": ["shelf_right"],
 			"capacity": 2,
 			"answers": [["鍵", "みつけた"], ["みつけた", "鍵"]],
@@ -256,6 +256,7 @@
 		{
 			"id": "future",
 			"hint": "窓の 星が よんでいる。窓を クリック",
+			"hint_after": "「きらきらした 明るい 未来」と 伝えよう",
 			"unlock": ["window"],
 			"capacity": 3,
 			"answers": [["きらきらした", "明るい", "未来"]],
