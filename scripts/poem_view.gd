@@ -1,19 +1,24 @@
 class_name PoemView
 extends Node2D
-## GameState から詩の行と単語ノードを配置する (画面上方)。ロジックは持たない。
-## 場面が変わると前の詩はディザで消え、新しい詩が一文字ずつ現れる。
+## GameState から詩の行と単語ノードを配置する (画面上方、部屋の上に重なる)。ロジックは持たない。
+## 手に入れた詩はページ (しおり) になり、選んだページだけが見える。
+## 新しく手に入れた詩は自動で開き、一文字ずつ現れる。
 
-const TOP := 34.0
-const LINE_H := 24.0
+signal page_changed
+
+const TOP := 20.0
+const LINE_H := 18.0
 const WORD_GAP := 10.0
 const TYPE_DELAY_PER_WORD := 0.2
 const TYPE_DELAY_PER_LINE := 0.5
-const FIRST_DELAY := 0.4
+const FIRST_DELAY := 0.3
 
 var game: Game
+var page := ""                 # いま開いている詩の id
 
 var _nodes: Dictionary = {}    # uid -> WordNode
 var _rects: Dictionary = {}    # uid -> Rect2
+var _page_of: Dictionary = {}  # uid -> 詩の id
 var _drag_uid := -1
 var _drag_offset := Vector2.ZERO
 
@@ -25,48 +30,64 @@ func setup(g: Game) -> void:
 	refresh()
 
 
+func select_page(pid: String) -> void:
+	if pid == page:
+		return
+	page = pid
+	refresh()
+	page_changed.emit()
+
+
 func refresh() -> void:
 	var s := game.state
+	if not page in s.got():
+		page = "" if s.got().is_empty() else s.got()[-1]
+		page_changed.emit()
 	var alive: Dictionary = {}
-	var lines := s.lines()
-	for li in lines.size():
-		var ws: Array = lines[li]["words"]
-		var y := TOP + li * LINE_H
-		var widths: Array = []
-		var total := WORD_GAP * maxi(0, ws.size() - 1)
-		for w in ws:
-			var ww := UIConst.text_width(w["t"])
-			widths.append(ww)
-			total += ww
-		var x := roundf((UIConst.SCREEN.x - total) / 2.0)
-		for wi in ws.size():
-			var w: Dictionary = ws[wi]
-			var uid: int = w["uid"]
-			alive[uid] = true
-			var rect := Rect2(x, y, widths[wi], UIConst.text_height())
-			_rects[uid] = rect
-			var node: WordNode = _nodes.get(uid)
-			var delay := 0.0
-			if node == null:
-				node = WordNode.new()
-				add_child(node)
-				node.setup(uid, w["t"], rect.position)
-				_nodes[uid] = node
-				delay = FIRST_DELAY + li * TYPE_DELAY_PER_LINE + wi * TYPE_DELAY_PER_WORD
-				node.typewrite(delay)
-			if uid != _drag_uid:
-				node.move_to(rect.position)
-			node.set_status(_status_of(s, w), delay)
-			x += widths[wi] + WORD_GAP
+	for pid in s.got():
+		var lines := s.poem_lines(pid)
+		for li in lines.size():
+			_layout_line(s, pid, li, lines[li]["words"], alive)
 
-	# 前の場面の言葉は溶けて消える
+	# 手に入れる前に戻った (Undo) 詩の言葉は消す
 	for uid in _nodes.keys():
 		if not alive.has(uid):
-			var node: WordNode = _nodes[uid]
-			node.set_status("gone")
-			get_tree().create_timer(0.5).timeout.connect(node.queue_free)
+			_nodes[uid].queue_free()
 			_nodes.erase(uid)
 			_rects.erase(uid)
+			_page_of.erase(uid)
+
+
+func _layout_line(s: GameState, pid: String, li: int, ws: Array, alive: Dictionary) -> void:
+	var y := TOP + li * LINE_H
+	var widths: Array = []
+	var total := WORD_GAP * maxi(0, ws.size() - 1)
+	for w in ws:
+		var ww := UIConst.text_width(w["t"])
+		widths.append(ww)
+		total += ww
+	var x := roundf((UIConst.SCREEN.x - total) / 2.0)
+	for wi in ws.size():
+		var w: Dictionary = ws[wi]
+		var uid: int = w["uid"]
+		alive[uid] = true
+		var rect := Rect2(x, y, widths[wi], UIConst.text_height())
+		_rects[uid] = rect
+		_page_of[uid] = pid
+		var node: WordNode = _nodes.get(uid)
+		var delay := 0.0
+		if node == null:
+			node = WordNode.new()
+			add_child(node)
+			node.setup(uid, w["t"], rect.position)
+			_nodes[uid] = node
+			delay = FIRST_DELAY + li * TYPE_DELAY_PER_LINE + wi * TYPE_DELAY_PER_WORD
+			node.typewrite(delay)
+		if uid != _drag_uid:
+			node.move_to(rect.position)
+		node.visible = pid == page or uid == _drag_uid
+		node.set_status(_status_of(s, w), delay)
+		x += widths[wi] + WORD_GAP
 
 
 func get_rect(uid: int) -> Rect2:
@@ -79,7 +100,9 @@ func get_word_node(uid: int) -> WordNode:
 
 ## p の上にある、さわれる単語の uid。なければ -1
 func uid_at(p: Vector2) -> int:
-	for line in game.state.lines():
+	if page == "":
+		return -1
+	for line in game.state.poem_lines(page):
 		for w in line["words"]:
 			if game.state.is_present(w) and get_rect(w["uid"]).grow(3.0).has_point(p):
 				return w["uid"]
@@ -92,6 +115,7 @@ func begin_drag(uid: int, p: Vector2, from_bubble: bool) -> void:
 	if node == null:
 		return
 	_drag_uid = uid
+	node.visible = true  # 別のページの言葉でも、運んでいる間は見せる
 	if from_bubble:
 		_drag_offset = Vector2(roundf(node.width() / 2.0), roundf(UIConst.text_height() / 2.0))
 	else:
@@ -111,6 +135,7 @@ func end_drag() -> void:
 	if node:
 		node.set_dragging(false)
 		node.move_to(get_rect(_drag_uid).position)
+		node.visible = _page_of.get(_drag_uid, "") == page
 	_drag_uid = -1
 
 
@@ -124,6 +149,8 @@ func _status_of(s: GameState, w: Dictionary) -> String:
 
 func _on_fx(ev: Dictionary) -> void:
 	match ev["kind"]:
+		"collect":
+			select_page(ev["poem"])
 		"full":
 			for uid in ev["uids"]:
 				if _nodes.has(uid):

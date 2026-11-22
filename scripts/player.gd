@@ -49,6 +49,11 @@ func walk_to_screen(p: Vector2) -> void:
 	_path = nav.find_path(position, local)
 
 
+## 部屋の絵の座標 → 画面座標
+func room_to_screen(p: Vector2) -> Vector2:
+	return (get_parent() as Node2D).get_global_transform_with_canvas() * p
+
+
 ## 主人公の見た目上の矩形 (画面座標)。言葉を落とす先の判定に使う
 func body_screen_rect() -> Rect2:
 	var o := get_global_transform_with_canvas().origin

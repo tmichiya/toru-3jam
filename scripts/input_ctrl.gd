@@ -4,6 +4,7 @@ extends Node2D
 ##  - 詩の言葉をクリック → その言葉の演出
 ##  - 詩の言葉をドラッグして主人公 (吹き出し) へ落とす → 渡す
 ##  - 吹き出しの言葉をクリック / 外へドラッグ → 詩へ戻す
+##  - それ以外の場所をクリック → 主人公がそこへ歩く
 
 const DRAG_SLOP := 3.0
 const HOLD_TIME := 0.25
@@ -60,6 +61,10 @@ func _press(p: Vector2) -> void:
 	if _pressed_uid < 0:
 		_pressed_uid = player.bubble.uid_at(p)
 		_from_bubble = _pressed_uid >= 0
+	if _pressed_uid < 0:
+		# 言葉でなければ、そこへ歩いていく
+		player.walk_to_screen(p)
+		return
 	_press_pos = p
 	_press_time = 0.0
 	_dragging = false
