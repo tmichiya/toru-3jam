@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/game.gd" id="2_game"]
+[ext_resource type="Script" path="res://scripts/background.gd" id="3_bg"]
+[ext_resource type="Shader" path="res://shaders/dither_bg.gdshader" id="4_bgshader"]
+[ext_resource type="Script" path="res://scripts/poem_view.gd" id="5_poem"]
+[ext_resource type="Script" path="res://scripts/fx.gd" id="6_fx"]
+[ext_resource type="Script" path="res://scripts/input_ctrl.gd" id="7_input"]
+[ext_resource type="Script" path="res://scripts/ui.gd" id="8_ui"]
+[ext_resource type="Script" path="res://scripts/sfx.gd" id="9_sfx"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
+shader = ExtResource("4_bgshader")
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Game" type="Node" parent="."]
+script = ExtResource("2_game")
+
+[node name="Background" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_bg")
+offset_right = 480.0
+offset_bottom = 270.0
+mouse_filter = 2
+script = ExtResource("3_bg")
+
+[node name="Poem" type="Node2D" parent="."]
+script = ExtResource("5_poem")
+
+[node name="FX" type="Node2D" parent="."]
+script = ExtResource("6_fx")
+
+[node name="Input" type="Node2D" parent="."]
+script = ExtResource("7_input")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 480.0
+offset_bottom = 270.0
+mouse_filter = 2
+script = ExtResource("8_ui")
+
+[node name="SFX" type="Node" parent="."]
+script = ExtResource("9_sfx")
