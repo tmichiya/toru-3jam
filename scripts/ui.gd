@@ -1,6 +1,6 @@
 class_name GameUI
 extends Control
-## 画面の情報 (場面のヒント・操作説明・伝えるボタン・もどる/やりなおす・エンディング文)。
+## 画面の情報 (場面のヒント・伝えるボタン・もどる/やりなおす・エンディング文)。画面下はヒント1行とボタンだけにする。
 
 const MARGIN := 8.0
 
@@ -9,7 +9,6 @@ var player: Player
 var view: PoemView
 
 var _hint_label: Label
-var _help_label: Label
 var _ending_label: Label
 var _title_label: Label
 var _tell_button: Button
@@ -22,8 +21,6 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_label = _make_label("", Vector2(MARGIN, 254))
 	_hint_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
-	_help_label = _make_label("どの詩の ことばも つかえる", Vector2(MARGIN, 240))
-	_help_label.modulate.a = 0.55
 	# 扉を開けるとき、画面上部に大きく出る題 (ドットが崩れないよう 2 倍の大きさ)
 	_title_label = _make_label("", Vector2(0, 10))
 	_title_label.size = Vector2(UIConst.SCREEN.x, 28)
@@ -57,7 +54,6 @@ func _refresh() -> void:
 		create_tween().tween_property(_hint_label, "visible_ratio", 1.0, 0.05 * h.length())
 	_tell_button.disabled = game.state.message().is_empty()
 	_tell_button.visible = game.capacity() > 0
-	_help_label.visible = not game.state.d["ended"]
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
 		_title_label.text = ""
