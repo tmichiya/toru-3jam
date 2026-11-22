@@ -37,8 +37,15 @@ func capacity() -> int:
 	return 0 if state.d["ended"] else int(stage_def().get("capacity", 1))
 
 
+## 場面のヒント。その場面で開いた本棚・窓の詩を全部手に入れたら hint_after に変わる
 func hint() -> String:
-	return "" if state.d["ended"] else str(stage_def().get("hint", ""))
+	if state.d["ended"]:
+		return ""
+	var st := stage_def()
+	var opened: Array = st.get("unlock", [])
+	if st.has("hint_after") and not opened.is_empty() and not opened.any(spot_has_poem):
+		return str(st["hint_after"])
+	return str(st.get("hint", ""))
 
 
 func palette_color(id: String, idx: int) -> Color:
