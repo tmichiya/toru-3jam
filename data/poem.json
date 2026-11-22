@@ -1,8 +1,94 @@
 {
+	"intro": [
+		"とっても 悲しいことが あったとき",
+		"家から 出たくなくなる",
+		"外が いやになる",
+		"きみは ずっと 泣いていた",
+		"あの子を 外に 出してあげよう",
+		"「きらきらした 明るい 未来」へ"
+	],
+
 	"palette": {
 		"gray": ["#8e8e90", "#4c4c52"],
+		"red": ["#ff8f8f", "#7a1f3d"],
 		"blue": ["#86b6ea", "#26386e"],
-		"gold": ["#ffd47e", "#c8603a"]
+		"green": ["#9fe0a0", "#1f5a4a"],
+		"purple": ["#c9a0ff", "#3d2266"],
+		"gold": ["#ffd47e", "#c8603a"],
+		"white": ["#ffffff", "#a8b8d8"]
+	},
+
+	"comment_lexicon": "言葉ごとの演出 (anim)・効果 (effect: color)・道具 (tool: reverse=逆さ / shift=ずれる)。詩はここにある言葉を並べるだけ",
+	"lexicon": {
+		"灰色": { "anim": "ash", "effect": "color", "arg": "gray" },
+		"赤い": { "anim": "paint", "effect": "color", "arg": "red" },
+		"青い": { "anim": "paint", "effect": "color", "arg": "blue" },
+		"緑の": { "anim": "paint", "effect": "color", "arg": "green" },
+		"紫の": { "anim": "paint", "effect": "color", "arg": "purple" },
+		"金色": { "anim": "paint", "effect": "color", "arg": "gold" },
+		"白い": { "anim": "paint", "effect": "color", "arg": "white" },
+		"逆さ": { "anim": "flip", "tool": "reverse" },
+		"ずれる": { "anim": "slide", "tool": "shift" },
+		"部屋": { "anim": "town" },
+		"ひとり": { "anim": "hush" },
+		"ふたり": { "anim": "hands" },
+		"涙": { "anim": "pour" },
+		"笑顔": { "anim": "smile" },
+		"ぬくもり": { "anim": "light" },
+		"つめたい": { "anim": "hush" },
+		"夜": { "anim": "hush" },
+		"朝": { "anim": "morning" },
+		"昼": { "anim": "light" },
+		"夕方": { "anim": "fall" },
+		"やさしい": { "anim": "sparkle" },
+		"声": { "anim": "speak" },
+		"夢": { "anim": "dream" },
+		"風": { "anim": "wind" },
+		"眠る": { "anim": "sleep" },
+		"起きる": { "anim": "move" },
+		"扉": { "anim": "beyond" },
+		"閉じる": { "anim": "hush" },
+		"開く": { "anim": "spread" },
+		"なくした": { "anim": "fall" },
+		"みつけた": { "anim": "star" },
+		"鍵": { "anim": "key" },
+		"光": { "anim": "light" },
+		"影": { "anim": "hush" },
+		"きらきらした": { "anim": "sparkle" },
+		"星": { "anim": "star" },
+		"暗い": { "anim": "hush" },
+		"明るい": { "anim": "bright" },
+		"過去": { "anim": "beyond" },
+		"今": { "anim": "wait" },
+		"未来": { "anim": "future" },
+		"窓": { "anim": "light" },
+		"鳥": { "anim": "bird" },
+		"歌": { "anim": "sing" },
+		"雲": { "anim": "cloud" },
+		"川": { "anim": "river" },
+		"雨": { "anim": "pour" },
+		"月": { "anim": "dream" },
+		"太陽": { "anim": "bright" }
+	},
+	"comment_opposites": "逆さ を重ねると反対の言葉になる (両方向に書く)",
+	"opposites": {
+		"涙": "笑顔", "笑顔": "涙",
+		"暗い": "明るい", "明るい": "暗い",
+		"夜": "朝", "朝": "夜",
+		"ひとり": "ふたり", "ふたり": "ひとり",
+		"つめたい": "ぬくもり", "ぬくもり": "つめたい",
+		"閉じる": "開く", "開く": "閉じる",
+		"なくした": "みつけた", "みつけた": "なくした",
+		"眠る": "起きる", "起きる": "眠る",
+		"光": "影", "影": "光",
+		"過去": "未来", "未来": "過去"
+	},
+	"comment_shifts": "ずれる を重ねると、ひとつ先の意味へずれる (輪になっている)",
+	"shifts": {
+		"朝": "昼", "昼": "夕方", "夕方": "夜", "夜": "朝",
+		"過去": "今", "今": "未来", "未来": "過去",
+		"雲": "雨", "雨": "川", "川": "雲",
+		"星": "月", "月": "太陽", "太陽": "星"
 	},
 
 	"comment_coords": "座標はすべて部屋の絵 (art/room/room.png, 300x300) のピクセル座標。y は足元 (床の上面)",
@@ -38,88 +124,47 @@
 	},
 	"door_light": [227, 88, 16, 17],
 
+	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉",
 	"poems": [
 		{
 			"id": "p1", "title": "一",
 			"lines": [
-				[
-					{ "t": "灰色の", "anim": "ash", "effect": "color", "arg": "gray" },
-					{ "t": "部屋で", "anim": "town" },
-					{ "t": "ひとり", "anim": "hush" },
-					{ "t": "ないている", "anim": "pour" }
-				],
-				[
-					{ "t": "わすれた", "anim": "beyond" },
-					{ "t": "笑顔を", "key": "笑顔", "anim": "smile" },
-					{ "t": "さがして", "anim": "further" }
-				]
+				["灰色", "部屋", "ひとり"],
+				["赤い", "涙", { "t": "逆さ", "visible_in": "red" }],
+				[{ "t": "ぬくもり", "visible_in": "red" }, { "t": "風", "visible_in": "green" }]
 			]
 		},
 		{
 			"id": "p2", "title": "二",
 			"lines": [
-				[
-					{ "t": "なきつかれて", "anim": "sleep" },
-					{ "t": "ねむる", "anim": "sleep" },
-					{ "t": "きみ", "anim": "sparkle" }
-				],
-				[
-					{ "t": "明るい", "anim": "bright" },
-					{ "t": "朝が", "anim": "morning" },
-					{ "t": "くるまで", "anim": "wait" }
-				],
-				[
-					{ "t": "青い", "anim": "paint", "effect": "color", "arg": "blue" },
-					{ "t": "夢の", "anim": "dream" },
-					{ "t": "なか", "anim": "cloud" },
-					{ "t": "やさしい", "anim": "light" },
-					{ "t": "声", "anim": "speak" }
-				]
+				["青い", "夜", { "t": "ずれる", "visible_in": "blue" }],
+				["やさしい", "声", "眠る"],
+				["緑の", { "t": "夢", "visible_in": "green" }, { "t": "雲", "visible_in": "blue" }]
 			]
 		},
 		{
 			"id": "p3", "title": "三",
 			"lines": [
-				[
-					{ "t": "とざされた", "anim": "hush" },
-					{ "t": "扉の", "anim": "beyond" },
-					{ "t": "むこうに", "anim": "move" },
-					{ "t": "未来", "anim": "future" }
-				],
-				[
-					{ "t": "金色の", "anim": "paint", "effect": "color", "arg": "gold" },
-					{ "t": "光が", "anim": "light" },
-					{ "t": "さす", "anim": "star" }
-				],
-				[
-					{ "t": "ねむる", "anim": "sleep" },
-					{ "t": "鍵", "anim": "key", "visible_in": "gold" }
-				]
+				["紫の", "扉", "閉じる"],
+				["なくした", { "t": "鍵", "visible_in": "gold" }],
+				["金色", "光", { "t": "鳥", "visible_in": "purple" }]
 			]
 		},
 		{
 			"id": "p4", "title": "四",
 			"lines": [
-				[
-					{ "t": "きらきらとした", "anim": "sparkle" },
-					{ "t": "星の", "anim": "star" },
-					{ "t": "まど", "anim": "light" }
-				],
-				[
-					{ "t": "どこへ", "anim": "beyond" },
-					{ "t": "行こう", "anim": "move" },
-					{ "t": "鳥の", "anim": "bird" },
-					{ "t": "ように", "anim": "sing" }
-				]
+				["きらきらした", "星", "窓"],
+				["暗い", "過去", { "t": "歌", "visible_in": "white" }],
+				["白い", { "t": "川", "visible_in": "purple" }, { "t": "明るい", "visible_in": "white" }]
 			]
 		}
 	],
 
-	"comment_stages": "unlock = その場面で開く本棚/窓。answers = 伝えて正解になる言葉の並び (key)。reach = そこに着くと次の場面へ",
+	"comment_stages": "unlock = その場面で開く本棚/窓。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
 	"stages": [
 		{
 			"id": "cry",
-			"hint": "ないている。本棚で 詩を みつけて なきやませよう",
+			"hint": "ないている。本棚の 詩で 笑顔を とどけよう",
 			"unlock": ["shelf_bottom"],
 			"capacity": 1,
 			"answers": [["笑顔"]],
@@ -138,9 +183,9 @@
 		},
 		{
 			"id": "sleep",
-			"hint": "ねむってしまった。やさしく おこそう",
+			"hint": "ねむってしまった。朝の 笑顔で おこそう",
 			"capacity": 2,
-			"answers": [["やさしい", "笑顔"]],
+			"answers": [["朝", "笑顔"], ["笑顔", "朝"]],
 			"saturation": 0.3,
 			"player_anim": "sleep",
 			"can_move": false,
@@ -148,26 +193,27 @@
 		},
 		{
 			"id": "door",
-			"hint": "扉には 鍵が かかっている。鍵を さがさせよう",
+			"hint": "扉が 閉じている。鍵を みつけよう",
 			"unlock": ["shelf_right"],
 			"capacity": 2,
-			"answers": [["鍵", "さがして"], ["さがして", "鍵"]],
-			"saturation": 0.55,
+			"answers": [["鍵", "みつけた"], ["みつけた", "鍵"]],
+			"saturation": 0.5,
 			"player_anim": "idle",
 			"reaction": { "anim": "search", "time": 1.8 }
 		},
 		{
 			"id": "future",
-			"hint": "鍵を みつけた。どこへ 行こう。窓の 星に きいてみよう",
+			"hint": "鍵を みつけた。窓の 星に どこへ行くか きこう",
 			"unlock": ["window"],
 			"capacity": 3,
-			"answers": [["きらきらとした", "明るい", "未来"]],
-			"saturation": 0.8,
+			"answers": [["きらきらした", "明るい", "未来"]],
+			"saturation": 0.75,
 			"player_anim": "think",
 			"has_key": true,
 			"reaction": { "anim": "happy", "time": 1.2 }
 		}
 	],
+	"color_boost": 0.35,
 	"exit": "door",
-	"ending_text": "きらきらとした 明るい 未来へ、きみは 扉を あけた。"
+	"ending_text": "きらきらした 明るい 未来へ、きみは 扉を あけた。"
 }

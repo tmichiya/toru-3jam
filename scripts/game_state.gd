@@ -21,29 +21,39 @@ static func from_poem(poem: Dictionary) -> GameState:
 		"prev_color": "",    # ひとつ前の色 (グラデーション下側)
 		"ended": false,
 	}
+	var lexicon: Dictionary = poem.get("lexicon", {})
 	for p in poem["poems"]:
 		var lines: Array = []
 		for i in p["lines"].size():
 			var words: Array = []
 			for w in p["lines"][i]:
-				words.append(make_word(s.new_uid(), w))
+				var src: Dictionary = w if w is Dictionary else {"t": w}
+				words.append(make_word(s.new_uid(), src, lexicon))
 			lines.append({"id": "%s-%d" % [p["id"], i], "words": words})
 		s.d["poems"][p["id"]] = {"title": p.get("title", p["id"]), "lines": lines}
 	return s
 
 
-static func make_word(uid: int, src: Dictionary) -> Dictionary:
-	var t: String = src.get("t", "")
-	return {
+## 詩の中の言葉ひとつ。演出・効果・道具は lexicon (言葉の辞書) から引く
+static func make_word(uid: int, src: Dictionary, lexicon: Dictionary) -> Dictionary:
+	var w := {
 		"uid": uid,
-		"t": t,
-		"key": src.get("key", t),
-		"anim": src.get("anim", ""),
-		"effect": src.get("effect", ""),
-		"arg": src.get("arg", null),
 		"visible_in": src.get("visible_in", ""),
 		"in_bubble": false,
 	}
+	set_text(w, src.get("t", ""), lexicon)
+	return w
+
+
+## 言葉を別の言葉に変える (逆さ・ずれる)。見える色などその場所の性質はそのまま
+static func set_text(w: Dictionary, t: String, lexicon: Dictionary) -> void:
+	var lex: Dictionary = lexicon.get(t, {})
+	w["t"] = t
+	w["key"] = t
+	w["anim"] = lex.get("anim", "")
+	w["effect"] = lex.get("effect", "")
+	w["arg"] = lex.get("arg", null)
+	w["tool"] = lex.get("tool", "")
 
 
 func snapshot() -> Dictionary:

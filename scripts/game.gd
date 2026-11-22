@@ -94,6 +94,37 @@ func click(uid: int) -> void:
 	_commit(evs)
 
 
+## 道具の言葉 (逆さ・ずれる) を詩の言葉に重ねたとき、何に変わるか。変わらなければ ""
+func tool_result(tool_uid: int, target_uid: int) -> String:
+	var tool_w := state.word_by_uid(tool_uid)
+	var target := state.word_by_uid(target_uid)
+	if tool_w.is_empty() or target.is_empty() or tool_uid == target_uid:
+		return ""
+	if not state.is_present(tool_w) or not state.is_present(target):
+		return ""
+	var table: Dictionary = {}
+	match tool_w["tool"]:
+		"reverse":
+			table = poem.get("opposites", {})
+		"shift":
+			table = poem.get("shifts", {})
+	return str(table.get(target["key"], ""))
+
+
+## 道具の言葉を詩の言葉に重ねて、意味を変える (道具は何度でも使える)
+func apply_tool(tool_uid: int, target_uid: int) -> bool:
+	var to := tool_result(tool_uid, target_uid)
+	if to == "":
+		fx_requested.emit({"kind": "full", "uids": [target_uid]})
+		return false
+	_push()
+	var target := state.word_by_uid(target_uid)
+	var from: String = target["t"]
+	GameState.set_text(target, to, poem.get("lexicon", {}))
+	_commit([{"kind": "transform", "uids": [target_uid], "tool": state.word_by_uid(tool_uid)["tool"], "from": from}])
+	return true
+
+
 func can_give(uid: int) -> bool:
 	var w := state.word_by_uid(uid)
 	return not w.is_empty() and state.is_present(w) and state.message().size() < capacity()
