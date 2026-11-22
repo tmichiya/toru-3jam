@@ -24,6 +24,16 @@ var _question_t := 0.0
 var _has_key := false
 var _ended := false
 var _inside: Dictionary = {}  # いま居る spot -> true (着いた瞬間だけ知らせる)
+var _focused := false         # はじまりの場面で、真ん中に大きく見せている
+
+## 見た目の大きさ (はじまりは大きく、泣きやむと 1 に戻る)。絵・吹き出しの位置・当たり判定に効く
+var look_scale := 1.0:
+	set(v):
+		look_scale = v
+		if sprite:
+			sprite.scale = Vector2(v, v)
+			sprite.position = Vector2(-5, -14) * v
+			bubble.position = Vector2(0, -14 * v - 4)
 
 
 func setup(g: Game) -> void:
@@ -74,7 +84,7 @@ func room_to_screen(p: Vector2) -> Vector2:
 ## 主人公の見た目上の矩形 (画面座標)。言葉を落とす先の判定に使う
 func body_screen_rect() -> Rect2:
 	var o := get_global_transform_with_canvas().origin
-	return Rect2(o + Vector2(-5, -14), Vector2(10, 14))
+	return Rect2(o + Vector2(-5, -14) * look_scale, Vector2(10, 14) * look_scale)
 
 
 func accepts_drop(screen_p: Vector2) -> bool:
@@ -97,6 +107,24 @@ func _apply() -> void:
 	if not bool(st.get("can_move", true)):
 		_path.clear()
 	bubble.visible = game.capacity() > 0
+	_apply_focus(st.get("player_focus", {}))
+
+
+## はじまり: 画面の真ん中に大きく。そこを抜けたら (泣きやむ演出のあと) 元の場所・大きさへ戻る
+func _apply_focus(f: Dictionary) -> void:
+	if not f.is_empty() and not _ended:
+		_focused = true
+		position = Vector2(f["pos"][0], f["pos"][1])
+		look_scale = float(f.get("scale", 1.0))
+		return
+	if not _focused:
+		return
+	_focused = false
+	var st: Array = game.poem.get("start", [150, 177])
+	var tw := create_tween()
+	tw.tween_interval(1.4)
+	tw.tween_property(self, "position", Vector2(st[0], st[1]), 1.6).set_trans(Tween.TRANS_SINE)
+	tw.parallel().tween_property(self, "look_scale", 1.0, 1.6).set_trans(Tween.TRANS_SINE)
 
 
 func _walk_to_spot(spot: String) -> void:
@@ -164,7 +192,7 @@ func _check_spots() -> void:
 
 func _draw() -> void:
 	if _question_t > 0.0:
-		draw_string(UIConst.FONT, Vector2(3, -16), "？", HORIZONTAL_ALIGNMENT_LEFT, -1,
+		draw_string(UIConst.FONT, Vector2(3, roundf(-14 * look_scale) - 2), "？", HORIZONTAL_ALIGNMENT_LEFT, -1,
 			UIConst.FONT_SIZE, UIConst.TEXT_COLOR)
 	if _has_key or _ended:
 		# 手に持った鍵
