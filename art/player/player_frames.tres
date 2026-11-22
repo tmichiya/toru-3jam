@@ -4,79 +4,79 @@
 
 [sub_resource type="AtlasTexture" id="at_idle_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 0, 10, 14)
+region = Rect2(0, 0, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_idle_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 0, 10, 14)
+region = Rect2(15, 0, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_cry_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 14, 10, 14)
+region = Rect2(0, 26, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_cry_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 14, 10, 14)
+region = Rect2(15, 26, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_happy_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 28, 10, 14)
+region = Rect2(0, 52, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_happy_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 28, 10, 14)
+region = Rect2(15, 52, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_sleep_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 42, 10, 14)
+region = Rect2(0, 78, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_sleep_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 42, 10, 14)
+region = Rect2(15, 78, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_wake_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 56, 10, 14)
+region = Rect2(0, 104, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_wake_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 56, 10, 14)
+region = Rect2(15, 104, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_walk_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 70, 10, 14)
+region = Rect2(0, 130, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_walk_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 70, 10, 14)
+region = Rect2(15, 130, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_walk_2"]
 atlas = ExtResource("1_sheet")
-region = Rect2(20, 70, 10, 14)
+region = Rect2(30, 130, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_walk_3"]
 atlas = ExtResource("1_sheet")
-region = Rect2(30, 70, 10, 14)
+region = Rect2(45, 130, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_search_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 84, 10, 14)
+region = Rect2(0, 156, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_search_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 84, 10, 14)
+region = Rect2(15, 156, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_think_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 98, 10, 14)
+region = Rect2(0, 182, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_think_1"]
 atlas = ExtResource("1_sheet")
-region = Rect2(10, 98, 10, 14)
+region = Rect2(15, 182, 15, 26)
 
 [sub_resource type="AtlasTexture" id="at_tilt_0"]
 atlas = ExtResource("1_sheet")
-region = Rect2(0, 112, 10, 14)
+region = Rect2(0, 208, 15, 26)
 
 [resource]
 animations = [{
@@ -89,7 +89,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
-"speed": 3.0
+"speed": 2.5
 }, {
 "frames": [{
 "duration": 1.0,
