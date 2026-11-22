@@ -3,69 +3,74 @@ extends SceneTree
 ## godot --headless --path . -s res://tests/test_solution.gd
 
 var game: Game
+var failed := false
 
 
 func _init() -> void:
-
 	game = Game.new()
 	root.add_child(game)
 	game.load_poem("res://data/poem.json")
 
-	_check(not game.state.is_present(_w("言葉")), "青の前は 言葉 が見えない")
-	game.click(_uid("青い"))
-	_check(game.state.d["color"] == "blue", "青い をクリックで背景が青")
-	_check(game.state.is_present(_w("言葉")), "言葉 が見える")
+	# 1. 泣いている
+	_check(game.capacity() == 1, "最初は1語まで")
+	_check(game.give(_uid("雨が")), "雨が を渡す")
+	_check(not game.give(_uid("ふる")), "上限を超えては渡せない")
+	_check(not game.tell(), "雨が では泣きやまない")
+	_check(game.state.message().is_empty() and game.state.is_present(_w("雨が")), "伝えた言葉は詩へ戻る")
+	game.give(_uid("笑顔を"))
+	game.take_back(_uid("笑顔を"))
+	_check(game.state.message().is_empty(), "吹き出しから戻せる")
+	game.give(_uid("笑顔を"))
+	_check(game.tell(), "笑顔 で泣きやむ")
+	_check(game.stage_def()["id"] == "sleep" and game.capacity() == 2, "寝る場面へ・2語まで")
 
-	var at := _find("ふく")
-	_check(not game.drop(_uid("言葉"), at.x, _uid("ふく")), "つながらない場所には置けない")
-	_check(game.state.find_gap_of(_uid("言葉")).x < 0, "置けなければ元の場所のまま")
+	# 2. 寝ている
+	game.give(_uid("やさしい"))
+	game.give(_uid("声で"))
+	_check(game.tell(), "やさしい 声 で起きる")
+	_check(game.stage_def()["id"] == "door", "扉の場面へ")
 
-	at = _find("さらなる")
-	_check(game.drop(_uid("言葉"), at.x, _uid("さらなる")), "言葉 を さらなる の後ろへ固定")
-	_check(game.state.lines()[3]["revealed"], "新しい行が出現")
-	_check(game.hint().contains("未来"), "ヒントが次の目標へ")
+	# 3. 扉
+	_check(not game.state.can_see(_w("鍵を")), "金色の前は 鍵 が見えない")
+	_check(not game.give(_uid("鍵を")), "見えない言葉は渡せない")
+	game.click(_uid("金色の"))
+	_check(game.state.d["color"] == "gold", "金色の で背景が金")
+	game.give(_uid("鍵を"))
+	game.give(_uid("さがして"))
+	_check(game.tell(), "鍵 さがして で鍵が見つかる")
+	_check(game.stage_def()["id"] == "future" and game.capacity() == 3, "未来の場面へ・3語まで")
 
-	game.click(_uid("金色"))
-	_check(game.state.d["color"] == "gold", "金色 をクリックで背景が金")
-	at = _find("明るい")
-	_check(not game.drop(_uid("未来"), _find("朝").x, _uid("朝")), "未来 は 朝 の後ろには置けない")
-	_check(game.drop(_uid("未来"), at.x, _uid("明るい")), "未来 を 明るい の後ろへ")
-	_check(not game.state.d["ended"], "まだ終わらない")
-	_check(game.drop(_uid("きらきら"), at.x, -1), "きらきら を行頭 (明るい の前) へ")
-	_check(game.state.d["ended"], "エンディング")
+	# 4. 未来
+	game.give(_uid("明るい"))
+	game.give(_uid("きらきらとした"))
+	game.give(_uid("未来へ"))
+	_check(not game.tell(), "順番がちがうと伝わらない")
+	for t in ["きらきらとした", "明るい", "未来へ"]:
+		game.give(_uid(t))
+	_check(game.tell() and game.state.d["ended"], "エンディング")
 
 	game.undo()
 	_check(not game.state.d["ended"], "Undo でエンディング前へ")
-	game.return_home(_uid("未来"))
-	_check(game.state.find_gap_of(_uid("未来")).x < 0, "未来 が元の場所へ戻る")
 	game.reset()
-	_check(game.state.d["color"] == "gray" and game.state.d["fired"].is_empty(), "Reset で初期状態")
-	print("ALL OK")
-	quit(0)
+	_check(game.state.d["stage"] == 0 and game.state.d["color"] == "gray", "Reset で初期状態")
+	print("FAILED" if failed else "ALL OK")
+	quit(1 if failed else 0)
 
 
 func _check(ok: bool, msg: String) -> void:
 	if not ok:
+		failed = true
 		push_error("FAIL: " + msg)
-		quit(1)
 	else:
 		print("ok  ", msg)
 
 
-func _find(t: String) -> Vector2i:
-	var ls := game.state.lines()
-	for li in ls.size():
-		var ws: Array = ls[li]["words"]
-		for wi in ws.size():
-			var w: Dictionary = ws[wi]
-			if w["t"] == t and not GameState.is_gap(w):
-				return Vector2i(li, wi)
-	return Vector2i(-1, -1)
-
-
 func _w(t: String) -> Dictionary:
-	var at := _find(t)
-	return game.state.word(at.x, at.y)
+	for line in game.state.lines():
+		for w in line["words"]:
+			if w["t"] == t:
+				return w
+	return {}
 
 
 func _uid(t: String) -> int:

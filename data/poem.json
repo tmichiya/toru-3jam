@@ -1,60 +1,124 @@
 {
-  "palette": {
-	"gray": ["#8e8e90", "#4c4c52"],
-	"blue": ["#86b6ea", "#26386e"],
-	"gold": ["#ffd47e", "#c8603a"]
-  },
-  "lines": [
-	{ "id": "l1", "words": [
-	  { "t": "灰色", "yomi": "はいいろ", "anim": "ash" },
-	  { "t": "町", "yomi": "まち", "anim": "town" },
-	  { "t": "青い", "yomi": "あおい", "anim": "paint", "effect": "color", "arg": "blue" },
-	  { "t": "風", "yomi": "かぜ", "anim": "wind" },
-	  { "t": "ふく", "yomi": "ふく", "anim": "blow" }
-	]},
-	{ "id": "l2", "words": [
-	  { "t": "両手", "yomi": "りょうて", "anim": "hands" },
-	  { "t": "ひろげて", "yomi": "ひろげて", "anim": "spread" },
-	  { "t": "言葉", "yomi": "ことば", "anim": "speak", "visible_in": "blue" },
-	  { "t": "まつ", "yomi": "まつ", "anim": "wait" }
-	]},
-	{ "id": "l3", "words": [
-	  { "t": "動く", "yomi": "うごく", "anim": "move" },
-	  { "t": "雲", "yomi": "くも", "anim": "cloud" },
-	  { "t": "むこう", "yomi": "むこう", "anim": "beyond" },
-	  { "t": "さらなる", "yomi": "さらなる", "anim": "further" },
-	  { "t": "夢", "yomi": "ゆめ", "anim": "dream" }
-	]},
-	{ "id": "l4", "revealed": false, "words": [
-	  { "t": "きらきら", "yomi": "きらきら", "anim": "sparkle" },
-	  { "t": "星", "yomi": "ほし", "anim": "star" },
-	  { "t": "金色", "yomi": "きんいろ", "anim": "paint", "effect": "color", "arg": "gold" },
-	  { "t": "川", "yomi": "かわ", "anim": "river" },
-	  { "t": "おちる", "yomi": "おちる", "anim": "fall" }
-	]},
-	{ "id": "l5", "revealed": false, "words": [
-	  { "t": "光", "yomi": "ひかり", "anim": "light" },
-	  { "t": "そそぐ", "yomi": "そそぐ", "anim": "pour" },
-	  { "t": "鳥", "yomi": "とり", "anim": "bird" },
-	  { "t": "うたう", "yomi": "うたう", "anim": "sing" }
-	]},
-	{ "id": "l6", "revealed": false, "words": [
-	  { "t": "明るい", "yomi": "あかるい", "anim": "bright" },
-	  { "t": "朝", "yomi": "あさ", "anim": "morning" },
-	  { "t": "しずか", "yomi": "しずか", "anim": "hush" },
-	  { "t": "未来", "yomi": "みらい", "anim": "future", "visible_in": "gold" },
-	  { "t": "ねむる", "yomi": "ねむる", "anim": "sleep" }
-	]}
-  ],
-  "combos": [
-	{ "seq": ["さらなる", "言葉"], "effect": "reveal", "arg": ["l4", "l5", "l6"] },
-	{ "seq": ["きらきら", "明るい", "未来"], "effect": "ending" }
-  ],
-  "links": [],
-  "hints": [
-	"「さらなる」「言葉」を つなげよう",
-	"「きらきら」「明るい」「未来」を つなげよう",
-    ""
-  ],
-  "ending_text": "きらきらとした 明るい 未来を、きみは つないだ。"
+	"palette": {
+		"gray": ["#8e8e90", "#4c4c52"],
+		"blue": ["#86b6ea", "#26386e"],
+		"gold": ["#ffd47e", "#c8603a"]
+	},
+	"door_x": 660,
+	"stages": [
+		{
+			"id": "cry",
+			"hint": "ないている。ことばを とどけて なきやませよう",
+			"capacity": 1,
+			"saturation": 0.0,
+			"player_x": 150,
+			"player_anim": "cry",
+			"reaction": { "anim": "happy", "time": 1.4 },
+			"lines": [
+				[
+					{ "t": "灰色の", "yomi": "はいいろ", "anim": "ash" },
+					{ "t": "空から", "yomi": "そら", "anim": "cloud" },
+					{ "t": "つめたい", "yomi": "つめたい", "anim": "hush" },
+					{ "t": "雨が", "yomi": "あめ", "anim": "pour" },
+					{ "t": "ふる", "yomi": "ふる", "anim": "fall" }
+				],
+				[
+					{ "t": "ないている", "yomi": "ないている", "anim": "pour" },
+					{ "t": "きみに", "yomi": "きみ", "anim": "sparkle" },
+					{ "t": "小さな", "yomi": "ちいさな", "anim": "spread" },
+					{ "t": "笑顔を", "key": "笑顔", "yomi": "えがお", "anim": "smile" },
+					{ "t": "あげたい", "yomi": "あげたい", "anim": "hands" }
+				]
+			],
+			"answers": [["笑顔"]]
+		},
+		{
+			"id": "sleep",
+			"hint": "なきつかれて ねむってしまった。やさしく おこそう",
+			"capacity": 2,
+			"saturation": 0.3,
+			"player_x": 150,
+			"player_anim": "sleep",
+			"reaction": { "anim": "wake", "time": 1.2 },
+			"lines": [
+				[
+					{ "t": "なきつかれて", "yomi": "なきつかれて", "anim": "sleep" },
+					{ "t": "すやすや", "yomi": "すやすや", "anim": "dream" },
+					{ "t": "ねむる", "yomi": "ねむる", "anim": "sleep" }
+				],
+				[
+					{ "t": "青い", "yomi": "あおい", "anim": "paint", "effect": "color", "arg": "blue" },
+					{ "t": "夜が", "yomi": "よる", "anim": "hush" },
+					{ "t": "あけて", "yomi": "あけて", "anim": "morning" },
+					{ "t": "やさしい", "yomi": "やさしい", "anim": "light" },
+					{ "t": "声で", "key": "声", "yomi": "こえ", "anim": "speak" },
+					{ "t": "おはよう", "yomi": "おはよう", "anim": "morning" }
+				]
+			],
+			"answers": [["やさしい", "声"], ["やさしい", "おはよう"]]
+		},
+		{
+			"id": "door",
+			"hint": "扉の まえで たちどまった。鍵を さがさせよう",
+			"capacity": 2,
+			"saturation": 0.6,
+			"player_x": 610,
+			"player_anim": "idle",
+			"show_door": true,
+			"reaction": { "anim": "search", "time": 1.8 },
+			"lines": [
+				[
+					{ "t": "とざされた", "yomi": "とざされた", "anim": "hush" },
+					{ "t": "扉の", "yomi": "とびら", "anim": "beyond" },
+					{ "t": "まえで", "yomi": "まえ", "anim": "move" },
+					{ "t": "たちどまる", "yomi": "たちどまる", "anim": "wait" }
+				],
+				[
+					{ "t": "金色の", "yomi": "きんいろ", "anim": "paint", "effect": "color", "arg": "gold" },
+					{ "t": "光が", "yomi": "ひかり", "anim": "light" },
+					{ "t": "さす", "yomi": "さす", "anim": "star" },
+					{ "t": "草かげに", "yomi": "くさかげ", "anim": "town" }
+				],
+				[
+					{ "t": "ねむる", "yomi": "ねむる", "anim": "sleep" },
+					{ "t": "鍵を", "key": "鍵", "yomi": "かぎ", "anim": "key", "visible_in": "gold" },
+					{ "t": "さがして", "yomi": "さがして", "anim": "further" }
+				]
+			],
+			"answers": [["鍵", "さがして"], ["さがして", "鍵"]]
+		},
+		{
+			"id": "future",
+			"hint": "どこへ 行こう。未来を つくろう",
+			"capacity": 3,
+			"saturation": 0.85,
+			"player_x": 610,
+			"player_anim": "think",
+			"show_door": true,
+			"has_key": true,
+			"reaction": { "anim": "happy", "time": 1.2 },
+			"lines": [
+				[
+					{ "t": "どこへ", "yomi": "どこ", "anim": "beyond" },
+					{ "t": "行こう", "yomi": "いこう", "anim": "move" },
+					{ "t": "鍵を", "yomi": "かぎ", "anim": "key" },
+					{ "t": "にぎって", "yomi": "にぎって", "anim": "hands" }
+				],
+				[
+					{ "t": "きらきらとした", "yomi": "きらきら", "anim": "sparkle" },
+					{ "t": "星と", "yomi": "ほし", "anim": "star" },
+					{ "t": "明るい", "yomi": "あかるい", "anim": "bright" },
+					{ "t": "朝", "yomi": "あさ", "anim": "morning" }
+				],
+				[
+					{ "t": "その", "yomi": "その", "anim": "wait" },
+					{ "t": "さきに", "yomi": "さき", "anim": "further" },
+					{ "t": "ある", "yomi": "ある", "anim": "spread" },
+					{ "t": "未来へ", "key": "未来", "yomi": "みらい", "anim": "future" }
+				]
+			],
+			"answers": [["きらきらとした", "明るい", "未来"]]
+		}
+	],
+	"ending_text": "きらきらとした 明るい 未来へ、きみは あるきだした。"
 }

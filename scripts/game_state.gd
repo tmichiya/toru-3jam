@@ -3,35 +3,38 @@ extends RefCounted
 ## ゲームの純データ。これが唯一の真実で、View はここから描画するだけ。
 ## d はディープコピーするだけでスナップショットになる (Undo 用)。
 ##
-## 単語は行の配列の中の並び順がそのまま位置。元の場所から動いた単語は、
-## 元の場所に「穴」(gap_of = その単語の uid) を残す。
+## 場面 (stage) ごとに詩の行が入れ替わる。主人公に渡した言葉は message に並び、
+## 詩の中の元の言葉は in_bubble = true (貸し出し中) になる。
 
 var d: Dictionary = {}
 
 
 static func from_poem(poem: Dictionary) -> GameState:
 	var s := GameState.new()
-	var uid := 0
-	var lines: Array = []
-	for line in poem["lines"]:
-		var words: Array = []
-		for w in line["words"]:
-			uid += 1
-			words.append(make_word(uid, w))
-		lines.append({
-			"id": line["id"],
-			"revealed": line.get("revealed", true),
-			"words": words,
-		})
 	s.d = {
-		"lines": lines,
-		"next_uid": uid + 1,
+		"stage": 0,
+		"lines": [],
+		"next_uid": 1,
+		"message": [],       # 吹き出しに並んだ言葉の uid (渡した順)
 		"color": "gray",     # 現在の色
 		"prev_color": "",    # ひとつ前の色 (グラデーション下側)
-		"fired": [],         # 発動済みコンボの番号
 		"ended": false,
 	}
+	s.load_stage(poem, 0)
 	return s
+
+
+func load_stage(poem: Dictionary, idx: int) -> void:
+	d["stage"] = idx
+	d["message"] = []
+	var lines: Array = []
+	var src: Array = poem["stages"][idx]["lines"]
+	for i in src.size():
+		var words: Array = []
+		for w in src[i]:
+			words.append(make_word(new_uid(), w))
+		lines.append({"id": "%d-%d" % [idx, i], "words": words})
+	d["lines"] = lines
 
 
 static func make_word(uid: int, src: Dictionary) -> Dictionary:
@@ -44,14 +47,8 @@ static func make_word(uid: int, src: Dictionary) -> Dictionary:
 		"effect": src.get("effect", ""),
 		"arg": src.get("arg", null),
 		"visible_in": src.get("visible_in", ""),
-		"gap_of": -1,  # >= 0 なら、その uid の単語が元いた場所の穴
+		"in_bubble": false,
 	}
-
-
-static func make_gap(uid: int, of: Dictionary) -> Dictionary:
-	var g := make_word(uid, {"t": of["t"]})
-	g["gap_of"] = of["uid"]
-	return g
 
 
 func snapshot() -> Dictionary:
@@ -66,12 +63,8 @@ func lines() -> Array:
 	return d["lines"]
 
 
-func line_words(li: int) -> Array:
-	return d["lines"][li]["words"]
-
-
-func word(li: int, wi: int) -> Dictionary:
-	return d["lines"][li]["words"][wi]
+func message() -> Array:
+	return d["message"]
 
 
 func new_uid() -> int:
@@ -80,38 +73,19 @@ func new_uid() -> int:
 	return u
 
 
-static func is_gap(w: Dictionary) -> bool:
-	return int(w["gap_of"]) >= 0
-
-
-## 穴でなく、いまの色で見えている (= さわれる) か
-func is_present(w: Dictionary) -> bool:
-	if is_gap(w):
-		return false
+## いまの色で見えているか
+func can_see(w: Dictionary) -> bool:
 	return w["visible_in"] == "" or w["visible_in"] == d["color"]
 
 
-func find_uid(uid: int) -> Vector2i:
-	var ls := lines()
-	for li in ls.size():
-		var ws: Array = ls[li]["words"]
-		for wi in ws.size():
-			if ws[wi]["uid"] == uid:
-				return Vector2i(li, wi)
-	return Vector2i(-1, -1)
+## 詩の中にあって、さわれる (見えていて、貸し出し中でない) か
+func is_present(w: Dictionary) -> bool:
+	return not w["in_bubble"] and can_see(w)
 
 
 func word_by_uid(uid: int) -> Dictionary:
-	var at := find_uid(uid)
-	return {} if at.x < 0 else word(at.x, at.y)
-
-
-## uid の単語の元の場所の穴。家にいるなら (-1, -1)
-func find_gap_of(uid: int) -> Vector2i:
-	var ls := lines()
-	for li in ls.size():
-		var ws: Array = ls[li]["words"]
-		for wi in ws.size():
-			if int(ws[wi]["gap_of"]) == uid:
-				return Vector2i(li, wi)
-	return Vector2i(-1, -1)
+	for line in lines():
+		for w in line["words"]:
+			if w["uid"] == uid:
+				return w
+	return {}
