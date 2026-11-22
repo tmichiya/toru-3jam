@@ -3,6 +3,7 @@ extends Node
 ## ゲームロジック。入力から要求を受け、GameState を変え、signal で知らせる。
 ## View 側からは state を読むだけにして、変更は必ずここを通す。
 ##
+##  - arrive(spot): 主人公が本棚・窓・ベッドなどに着いた (詩を手に入れる / 場面が進む)
 ##  - click(uid): その言葉の演出 (+ 色などの効果)
 ##  - give(uid) / take_back(uid): 主人公の吹き出しに言葉を渡す / 戻す
 ##  - tell(): 吹き出しの言葉を伝える。場面の答えと合えば次の場面へ
@@ -33,7 +34,7 @@ func stage_def() -> Dictionary:
 
 
 func capacity() -> int:
-	return int(stage_def().get("capacity", 1))
+	return 0 if state.d["ended"] else int(stage_def().get("capacity", 1))
 
 
 func hint() -> String:
@@ -44,6 +45,39 @@ func palette_color(id: String, idx: int) -> Color:
 	var pal: Dictionary = poem.get("palette", {})
 	var pair: Array = pal.get(id, pal.get("gray", ["#888888", "#444444"]))
 	return Color(pair[idx])
+
+
+## これまでの場面で開いた本棚・窓
+func unlocked() -> Array:
+	var out: Array = []
+	for i in state.d["stage"] + 1:
+		out.append_array(poem["stages"][i].get("unlock", []))
+	return out
+
+
+## 開いていて、まだ詩を手に入れていない本棚・窓か
+func spot_has_poem(spot: String) -> bool:
+	var sp: Dictionary = poem["spots"].get(spot, {})
+	return sp.has("poem") and spot in unlocked() and not sp["poem"] in state.got()
+
+
+## 主人公が spot に着いた
+func arrive(spot: String) -> void:
+	if state.d["ended"]:
+		return
+	var evs: Array = []
+	if spot_has_poem(spot):
+		_push()
+		var pid: String = poem["spots"][spot]["poem"]
+		state.got().append(pid)
+		evs.append({"kind": "collect", "uids": [], "poem": pid, "spot": spot})
+	if stage_def().get("reach", "") == spot:
+		if evs.is_empty():
+			_push()
+		evs.append({"kind": "told_ok", "uids": [], "stage": stage_def()["id"]})
+		evs.append_array(_advance())
+	if not evs.is_empty():
+		_commit(evs)
 
 
 ## 言葉をクリック: 意味の演出 + 効果
@@ -62,8 +96,7 @@ func click(uid: int) -> void:
 
 func can_give(uid: int) -> bool:
 	var w := state.word_by_uid(uid)
-	return not w.is_empty() and state.is_present(w) and not state.d["ended"] \
-		and state.message().size() < capacity()
+	return not w.is_empty() and state.is_present(w) and state.message().size() < capacity()
 
 
 ## 吹き出しに言葉を渡す (末尾に並ぶ)
@@ -102,15 +135,8 @@ func tell() -> bool:
 	if not keys in stage_def().get("answers", []):
 		_commit([{"kind": "told_ng", "uids": msg}])
 		return false
-
 	var evs: Array = [{"kind": "told_ok", "uids": msg, "stage": stage_def()["id"]}]
-	var next: int = state.d["stage"] + 1
-	if next >= poem["stages"].size():
-		state.d["ended"] = true
-		evs.append({"kind": "ending", "uids": []})
-	else:
-		state.load_stage(poem, next)
-		evs.append({"kind": "stage", "uids": []})
+	evs.append_array(_advance())
 	_commit(evs)
 	return true
 
@@ -128,6 +154,20 @@ func reset() -> void:
 	state.restore(_initial)
 	_history.clear()
 	_commit([{"kind": "undo", "uids": []}])
+
+
+## 次の場面へ (最後ならエンディング)
+func _advance() -> Array:
+	# 吹き出しに残っている言葉は詩へ戻す
+	for u in state.message():
+		state.word_by_uid(u)["in_bubble"] = false
+	state.message().clear()
+	var next: int = state.d["stage"] + 1
+	if next >= poem["stages"].size():
+		state.d["ended"] = true
+		return [{"kind": "ending", "uids": []}]
+	state.d["stage"] = next
+	return [{"kind": "stage", "uids": []}]
 
 
 func _push() -> void:
