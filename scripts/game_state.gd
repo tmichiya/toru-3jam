@@ -13,7 +13,7 @@ static func from_poem(poem: Dictionary) -> GameState:
 	var s := GameState.new()
 	s.d = {
 		"stage": 0,
-		"got": [],           # 手に入れた詩の id (手に入れた順)
+		"got": poem.get("start_poems", []).duplicate(),  # 手に入れた詩の id (手に入れた順)
 		"poems": {},         # 詩 id -> { "title", "lines": [{ "id", "words" }] }
 		"next_uid": 1,
 		"message": [],       # 吹き出しに並んだ言葉の uid (渡した順)

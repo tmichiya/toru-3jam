@@ -13,11 +13,9 @@ func _init() -> void:
 	_test_nav()
 
 	# 1. 泣いている: 赤で 逆さ が見え、涙を逆さにして 笑顔
-	_check(game.state.got().is_empty(), "最初は詩を持っていない")
+	_check(game.state.got() == ["p1"], "最初から 詩一 を持っている")
 	game.arrive("shelf_left")
-	_check(game.state.got().is_empty(), "まだ開いていない本棚からは手に入らない")
-	game.arrive("shelf_bottom")
-	_check(game.state.got() == ["p1"], "下の本棚で 詩一 を手に入れる")
+	_check(game.state.got() == ["p1"], "まだ開いていない本棚からは手に入らない")
 	_check(not game.apply_tool(_uid("逆さ"), _uid("涙")), "赤の前は 逆さ が見えない")
 	game.click(_uid("赤い"))
 	_check(not game.apply_tool(_uid("逆さ"), _uid("部屋")), "部屋 は逆さにできない")
@@ -69,7 +67,7 @@ func _init() -> void:
 	game.undo()
 	_check(not game.state.d["ended"], "Undo でエンディング前へ")
 	game.reset()
-	_check(game.state.d["stage"] == 0 and _uid("涙") > 0, "Reset で初期状態 (涙 に戻る)")
+	_check(game.state.d["stage"] == 0 and game.state.got() == ["p1"] and _uid("涙") > 0, "Reset で初期状態 (涙 に戻る)")
 	print("FAILED" if failed else "ALL OK")
 	quit(1 if failed else 0)
 

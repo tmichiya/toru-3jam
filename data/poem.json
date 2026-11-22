@@ -115,14 +115,21 @@
 		]
 	},
 	"spots": {
-		"shelf_bottom": { "points": [[162, 177]], "poem": "p1", "mark": [162, 152] },
 		"shelf_left": { "points": [[96, 129]], "poem": "p2", "mark": [93, 107] },
 		"shelf_right": { "points": [[228, 129]], "poem": "p3", "mark": [228, 107] },
-		"window": { "points": [[143, 105], [189, 106]], "poem": "p4", "mark": [161, 60] },
+		"window": { "points": [[143, 105], [189, 106]], "poem": "p4", "mark": [161, 60], "area": [128, 55, 66, 78] },
 		"bed": { "points": [[88, 105]] },
 		"door": { "points": [[234, 106]] }
 	},
 	"door_light": [227, 88, 16, 17],
+
+	"comment_start": "最初から持っている詩。poem_layout = 詩を置く場所 (画面座標, x は列の中心)。focus_poem の場面ではその詩を上の真ん中に大きく置く",
+	"start_poems": ["p1"],
+	"poem_layout": {
+		"p1": [82, 14], "p2": [82, 132],
+		"p3": [410, 14], "p4": [410, 132],
+		"focus": [240, 34]
+	},
 
 	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉",
 	"poems": [
@@ -164,8 +171,10 @@
 	"stages": [
 		{
 			"id": "cry",
-			"hint": "ないている。本棚の 詩で 笑顔を とどけよう",
-			"unlock": ["shelf_bottom"],
+			"hint": "ないている。上の 詩で 笑顔を とどけよう",
+			"focus_poem": "p1",
+			"hide_room": true,
+			"can_move": false,
 			"capacity": 1,
 			"answers": [["笑顔"]],
 			"saturation": 0.0,
@@ -203,7 +212,7 @@
 		},
 		{
 			"id": "future",
-			"hint": "鍵を みつけた。窓の 星に どこへ行くか きこう",
+			"hint": "窓の 星が よんでいる。窓を クリック",
 			"unlock": ["window"],
 			"capacity": 3,
 			"answers": [["きらきらした", "明るい", "未来"]],
