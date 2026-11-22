@@ -16,6 +16,7 @@ var _table: Dictionary = {}
 
 func _init() -> void:
 	_table = {
+		"smile": _smile, "key": _key,
 		"ash": _ash, "town": _town, "paint": _paint, "wind": _wind, "blow": _blow,
 		"hands": _hands, "spread": _spread, "speak": _speak, "wait": _wait,
 		"move": _move, "cloud": _cloud, "beyond": _beyond, "further": _further, "dream": _dream,
@@ -51,6 +52,18 @@ func _town(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
 
 
 ## 色: 波紋 (背景の色替えは background が受け持つ)
+## 笑顔: にっこり顔がふわっと浮かぶ
+func _smile(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
+	fx.sprite("smile", r.get_center() - Vector2(4, 8), Vector2(0, -14), 1.6, UIConst.HILITE_COLOR)
+	fx.stars(r.grow(10.0), PINK, 8)
+
+
+## 鍵: 鍵がきらりと光る
+func _key(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
+	fx.sprite("key", r.get_center() - Vector2(4, 10), Vector2(0, -10), 1.4, Color("ffd47e"))
+	fx.stars(Rect2(r.get_center() + Vector2(-6, -16), Vector2(14, 8)), Color.WHITE, 4, 0.3)
+
+
 func _paint(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
 	fx.ring(r.get_center(), Color.WHITE, 24, 40.0)
 

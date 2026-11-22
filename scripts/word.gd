@@ -5,6 +5,7 @@ extends Node2D
 const DISSOLVE := preload("res://shaders/dissolve.gdshader")
 const FOLLOW_SPEED := 14.0
 const HIDDEN_PROGRESS := 0.93  # 隠れている言葉: ほんの少しだけ画素がゆらいで見える
+const LENT_PROGRESS := 0.75    # 吹き出しに貸し出し中: うすく残る
 
 var uid := -1
 var text := ""
@@ -80,9 +81,17 @@ func set_highlight(v: bool) -> void:
 	_highlight = v
 
 
+## ドラッグ中は (貸し出し中でも) くっきり見せ、離したら状態の見た目に戻す
 func set_dragging(v: bool) -> void:
 	_dragging = v
 	z_index = 10 if v else 0
+	if _tween:
+		_tween.kill()
+	if v:
+		_set_progress(0.0)
+	else:
+		_tween = create_tween()
+		_tween.tween_method(_set_progress, _progress, _progress_for(status), 0.3)
 
 
 func drag_to(p: Vector2) -> void:
@@ -142,6 +151,8 @@ func _progress_for(st: String) -> float:
 			return 0.0
 		"hidden":
 			return HIDDEN_PROGRESS
+		"lent":
+			return LENT_PROGRESS
 	return 1.0
 
 

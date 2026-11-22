@@ -1,25 +1,28 @@
 class_name GameUI
 extends Control
-## 画面端の情報 (目標のヒント・操作説明・操作ボタン・エンディング文)。UI は日本語のまま。
+## 画面の情報 (場面のヒント・操作説明・伝えるボタン・もどる/やりなおす・エンディング文)。
 
 const MARGIN := 8.0
 
 var game: Game
+var player: Player
 
 var _hint_label: Label
 var _ending_label: Label
+var _tell_button: Button
 
 
-func setup(g: Game) -> void:
+func setup(g: Game, p: Player) -> void:
 	game = g
+	player = p
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_hint_label = _make_label("", Vector2(0, 12))
+	_hint_label = _make_label("", Vector2(0, 10))
 	_hint_label.size = Vector2(UIConst.SCREEN.x, 16)
 	_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
-	var help := _make_label("クリック：ことばの ちから ／ ドラッグ：はこぶ", Vector2(MARGIN, 250))
+	var help := _make_label("クリック：ことばの ちから ／ ドラッグ：主人公へ わたす", Vector2(MARGIN, 252))
 	help.modulate.a = 0.6
-	_ending_label = _make_label("", Vector2(0, 214))
+	_ending_label = _make_label("", Vector2(0, 120))
 	_ending_label.size = Vector2(UIConst.SCREEN.x, 16)
 	_ending_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_ending_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
@@ -28,8 +31,10 @@ func setup(g: Game) -> void:
 	for def in [["やりなおす", game.reset], ["もどる", game.undo]]:
 		var btn := _make_button(def[0], def[1])
 		x -= btn.size.x
-		btn.position = Vector2(x, 248)
+		btn.position = Vector2(x, 250)
 		x -= 6.0
+	_tell_button = _make_button("伝える", game.tell)
+	_tell_button.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
 
 	g.state_changed.connect(_refresh)
 	g.fx_requested.connect(_on_fx)
@@ -42,8 +47,17 @@ func _refresh() -> void:
 		_hint_label.text = h
 		_hint_label.visible_ratio = 0.0
 		create_tween().tween_property(_hint_label, "visible_ratio", 1.0, 0.05 * h.length())
+	_tell_button.disabled = game.state.message().is_empty()
+	_tell_button.visible = not game.state.d["ended"]
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
+
+
+## 伝えるボタンは吹き出しの右にくっついて動く
+func _process(_delta: float) -> void:
+	if _tell_button.visible:
+		var r := player.bubble.screen_rect()
+		_tell_button.position = Vector2(r.end.x + 2, r.position.y + (r.size.y - _tell_button.size.y) / 2.0).round()
 
 
 func _on_fx(ev: Dictionary) -> void:
@@ -51,7 +65,7 @@ func _on_fx(ev: Dictionary) -> void:
 		_ending_label.text = game.poem.get("ending_text", "")
 		_ending_label.visible_ratio = 0.0
 		var tw := create_tween()
-		tw.tween_interval(2.5)
+		tw.tween_interval(3.0)
 		tw.tween_property(_ending_label, "visible_ratio", 1.0, 3.0)
 
 
@@ -77,6 +91,7 @@ func _make_button(t: String, cb: Callable) -> Button:
 	b.add_theme_color_override("font_color", Color(UIConst.TEXT_COLOR, 0.75))
 	b.add_theme_color_override("font_hover_color", UIConst.HILITE_COLOR)
 	b.add_theme_color_override("font_pressed_color", UIConst.HILITE_COLOR)
+	b.add_theme_color_override("font_disabled_color", Color(UIConst.TEXT_COLOR, 0.3))
 	b.pressed.connect(cb)
 	add_child(b)
 	b.size = b.get_combined_minimum_size()

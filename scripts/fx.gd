@@ -8,6 +8,7 @@ const DISSOLVE := preload("res://shaders/dissolve.gdshader")
 
 var game: Game
 var view: PoemView
+var player: Player
 var anims := WordAnims.new()
 
 var _ps: Array = []
@@ -15,9 +16,10 @@ var _flash: ColorRect
 var _flash_mat: ShaderMaterial
 
 
-func setup(g: Game, v: PoemView) -> void:
+func setup(g: Game, v: PoemView, p: Player) -> void:
 	game = g
 	view = v
+	player = p
 	z_index = 20
 	_flash = ColorRect.new()
 	_flash.size = UIConst.SCREEN
@@ -38,20 +40,20 @@ func _on_fx(ev: Dictionary) -> void:
 				var node := view.get_word_node(uid)
 				if node:
 					anims.play(ev["anim"], node, self, view.get_rect(uid))
-		"snap":
-			for uid in uids:
-				stars(view.get_rect(uid).grow(6.0), UIConst.HILITE_COLOR, 8)
+		"give":
+			stars(player.bubble.screen_rect().grow(4.0), UIConst.HILITE_COLOR, 6)
 		"color":
 			var c := game.palette_color(ev["color"], 0)
 			for uid in uids:
 				ring(view.get_rect(uid).get_center(), c, 48, 70.0)
-		"reveal":
-			for uid in uids:
-				burst(view.get_rect(uid), UIConst.HILITE_COLOR, 40)
+		"told_ok":
+			var r := player.body_screen_rect()
+			stars(r.grow(16.0), UIConst.HILITE_COLOR, 20)
+			ring(r.get_center(), Color.WHITE, 40, 80.0)
 		"ending":
-			for uid in uids:
-				burst(view.get_rect(uid), UIConst.HILITE_COLOR, 80)
-				ring(view.get_rect(uid).get_center(), Color.WHITE, 80, 160.0)
+			var r := player.body_screen_rect()
+			burst(r.grow(10.0), UIConst.HILITE_COLOR, 80)
+			ring(r.get_center(), Color.WHITE, 80, 160.0)
 			flash(Color.WHITE, 1.2, 0.3)
 
 
