@@ -22,6 +22,8 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hint_label = _make_label("", Vector2(MARGIN, 254))
 	_hint_label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
+	var help := _make_label("「逆さ」「ずれる」は ことばに かさねる", Vector2(MARGIN, 240))
+	help.modulate.a = 0.55
 	_ending_label = _make_label("", Vector2(0, 60))
 	_ending_label.size = Vector2(UIConst.SCREEN.x, 16)
 	_ending_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -72,6 +74,14 @@ func _refresh_tabs() -> void:
 		var on: bool = pid == view.page
 		b.add_theme_color_override("font_color", UIConst.HILITE_COLOR if on else Color(UIConst.TEXT_COLOR, 0.5))
 		x += b.size.x + 2.0
+
+
+## 画面座標 p にあるしおりの詩 id。なければ ""
+func tab_at(p: Vector2) -> String:
+	for pid in _tabs:
+		if (_tabs[pid] as Button).get_global_rect().grow(2.0).has_point(p):
+			return pid
+	return ""
 
 
 ## 伝えるボタンは吹き出しの右にくっついて動く

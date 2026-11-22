@@ -83,6 +83,8 @@ func _layout_line(s: GameState, pid: String, li: int, ws: Array, alive: Dictiona
 			_nodes[uid] = node
 			delay = FIRST_DELAY + li * TYPE_DELAY_PER_LINE + wi * TYPE_DELAY_PER_WORD
 			node.typewrite(delay)
+		if node.text != w["t"]:
+			node.queue_text(w["t"])
 		if uid != _drag_uid:
 			node.move_to(rect.position)
 		node.visible = pid == page or uid == _drag_uid
@@ -98,15 +100,23 @@ func get_word_node(uid: int) -> WordNode:
 	return _nodes.get(uid)
 
 
-## p の上にある、さわれる単語の uid。なければ -1
-func uid_at(p: Vector2) -> int:
+## p の上にある、さわれる単語の uid。なければ -1 (exclude はドラッグ中の言葉など除外するもの)
+func uid_at(p: Vector2, exclude: int = -1) -> int:
 	if page == "":
 		return -1
 	for line in game.state.poem_lines(page):
 		for w in line["words"]:
-			if game.state.is_present(w) and get_rect(w["uid"]).grow(3.0).has_point(p):
+			if w["uid"] != exclude and game.state.is_present(w) and get_rect(w["uid"]).grow(3.0).has_point(p):
 				return w["uid"]
 	return -1
+
+
+## ドラッグ中の言葉の下で、重ねると意味が変わる言葉をうっすら光らせる
+func hover_tool_target(tool_uid: int, p: Vector2) -> void:
+	var target := uid_at(p, tool_uid)
+	for uid in _nodes:
+		if uid != tool_uid:
+			_nodes[uid].set_highlight(uid == target and game.tool_result(tool_uid, target) != "")
 
 
 ## ドラッグ開始。from_bubble なら吹き出しから引き抜いた言葉 (カーソル中央に持つ)
@@ -136,6 +146,8 @@ func end_drag() -> void:
 		node.set_dragging(false)
 		node.move_to(get_rect(_drag_uid).position)
 		node.visible = _page_of.get(_drag_uid, "") == page
+	for n in _nodes.values():
+		n.set_highlight(false)
 	_drag_uid = -1
 
 
@@ -151,6 +163,10 @@ func _on_fx(ev: Dictionary) -> void:
 	match ev["kind"]:
 		"collect":
 			select_page(ev["poem"])
+		"transform":
+			for uid in ev["uids"]:
+				if _nodes.has(uid):
+					_nodes[uid].morph(ev["tool"])
 		"full":
 			for uid in ev["uids"]:
 				if _nodes.has(uid):
