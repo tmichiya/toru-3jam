@@ -6,7 +6,7 @@ extends Node2D
 ## 見た目は子の AnimatedSprite2D (art/player/player_frames.tres) を差し替えればよい。
 ## 座標は部屋の絵のピクセル座標 (親の World が画面上の位置へずらしている)。
 
-const WALK_SPEED := 32.0
+const WALK_SPEED := 42.0
 const ARRIVE_DIST := 5.0
 const KEY_COLOR := Color("ffd47e")
 
