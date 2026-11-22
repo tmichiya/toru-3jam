@@ -9,6 +9,8 @@ extends Node2D
 signal walked_by_click  # クリックで歩き出した (操作説明のテロップを消すのに使う)
 
 const WALK_SPEED := 42.0
+const EXIT_WALK_SPEED := 20.0  # エンディングで扉へ向かうときは、ゆっくり歩く
+const EXIT_FADE_TIME := 3.0    # 扉をくぐって消えるまでの秒数
 const ARRIVE_DIST := 5.0
 const KEY_COLOR := Color("ffd47e")
 ## 絵の 1 コマ (15x26) の中で、足元 (体の下端の行 18) が原点に来るようにずらす
@@ -164,7 +166,7 @@ func _process(delta: float) -> void:
 		anim = _once
 	elif not _path.is_empty():
 		var to := _path[0]
-		var step := WALK_SPEED * delta
+		var step := (EXIT_WALK_SPEED if _ended else WALK_SPEED) * delta
 		if position.distance_to(to) <= step:
 			position = to
 			_path.remove_at(0)
@@ -175,8 +177,9 @@ func _process(delta: float) -> void:
 				sprite.flip_h = dir.x < 0.0
 		anim = "walk"
 	elif _ended and modulate.a > 0.0:
-		# 扉の中へ消えていく
-		modulate.a = maxf(0.0, modulate.a - delta * 0.8)
+		# 扉の前で足をとめず、光の中へゆっくり歩いて入り、溶けるように消えていく
+		anim = "walk"
+		modulate.a = maxf(0.0, modulate.a - delta / EXIT_FADE_TIME)
 	if sprite.animation != anim and sprite.sprite_frames.has_animation(anim):
 		sprite.play(anim)
 	_check_spots()

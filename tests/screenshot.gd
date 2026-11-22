@@ -94,7 +94,9 @@ func _init() -> void:
 	await _wait(0.5)
 	_save("4_give")
 	game.tell()
-	await _wait(9.0)
+	await _wait(4.8)
+	_save("5_entering_door")
+	await _wait(7.0)
 	_save("5_end")
 	quit(0)
 
