@@ -17,7 +17,7 @@
 [ext_resource type="Shader" path="res://shaders/saturation.gdshader" id="15_satshader"]
 [ext_resource type="Shader" path="res://shaders/key_dark.gdshader" id="16_key"]
 [ext_resource type="Script" path="res://scripts/intro.gd" id="17_intro"]
-[ext_resource type="AudioStream" path="res://audio/BGM/bgm.mp3" id="18_bgm"]
+[ext_resource type="AudioStream" path="res://audio/BGM/BGM.ogg" id="18_bgm"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("4_bgshader")
