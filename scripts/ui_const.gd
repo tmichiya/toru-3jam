@@ -5,6 +5,7 @@ extends RefCounted
 const FONT: Font = preload("res://fonts/text_font.ttf")
 const FONT_SIZE := 12
 const SCREEN := Vector2(480, 270)
+const GROUND_Y := 228.0  # 主人公が立つ一本線の高さ (ワールド座標)
 
 const TEXT_COLOR := Color("f4f1ea")
 const HILITE_COLOR := Color("fff1a0")

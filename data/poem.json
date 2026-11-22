@@ -1,60 +1,228 @@
 {
-  "palette": {
-	"gray": ["#8e8e90", "#4c4c52"],
-	"blue": ["#86b6ea", "#26386e"],
-	"gold": ["#ffd47e", "#c8603a"]
-  },
-  "lines": [
-	{ "id": "l1", "words": [
-	  { "t": "灰色", "yomi": "はいいろ", "anim": "ash" },
-	  { "t": "町", "yomi": "まち", "anim": "town" },
-	  { "t": "青い", "yomi": "あおい", "anim": "paint", "effect": "color", "arg": "blue" },
-	  { "t": "風", "yomi": "かぜ", "anim": "wind" },
-	  { "t": "ふく", "yomi": "ふく", "anim": "blow" }
-	]},
-	{ "id": "l2", "words": [
-	  { "t": "両手", "yomi": "りょうて", "anim": "hands" },
-	  { "t": "ひろげて", "yomi": "ひろげて", "anim": "spread" },
-	  { "t": "言葉", "yomi": "ことば", "anim": "speak", "visible_in": "blue" },
-	  { "t": "まつ", "yomi": "まつ", "anim": "wait" }
-	]},
-	{ "id": "l3", "words": [
-	  { "t": "動く", "yomi": "うごく", "anim": "move" },
-	  { "t": "雲", "yomi": "くも", "anim": "cloud" },
-	  { "t": "むこう", "yomi": "むこう", "anim": "beyond" },
-	  { "t": "さらなる", "yomi": "さらなる", "anim": "further" },
-	  { "t": "夢", "yomi": "ゆめ", "anim": "dream" }
-	]},
-	{ "id": "l4", "revealed": false, "words": [
-	  { "t": "きらきら", "yomi": "きらきら", "anim": "sparkle" },
-	  { "t": "星", "yomi": "ほし", "anim": "star" },
-	  { "t": "金色", "yomi": "きんいろ", "anim": "paint", "effect": "color", "arg": "gold" },
-	  { "t": "川", "yomi": "かわ", "anim": "river" },
-	  { "t": "おちる", "yomi": "おちる", "anim": "fall" }
-	]},
-	{ "id": "l5", "revealed": false, "words": [
-	  { "t": "光", "yomi": "ひかり", "anim": "light" },
-	  { "t": "そそぐ", "yomi": "そそぐ", "anim": "pour" },
-	  { "t": "鳥", "yomi": "とり", "anim": "bird" },
-	  { "t": "うたう", "yomi": "うたう", "anim": "sing" }
-	]},
-	{ "id": "l6", "revealed": false, "words": [
-	  { "t": "明るい", "yomi": "あかるい", "anim": "bright" },
-	  { "t": "朝", "yomi": "あさ", "anim": "morning" },
-	  { "t": "しずか", "yomi": "しずか", "anim": "hush" },
-	  { "t": "未来", "yomi": "みらい", "anim": "future", "visible_in": "gold" },
-	  { "t": "ねむる", "yomi": "ねむる", "anim": "sleep" }
-	]}
-  ],
-  "combos": [
-	{ "seq": ["さらなる", "言葉"], "effect": "reveal", "arg": ["l4", "l5", "l6"] },
-	{ "seq": ["きらきら", "明るい", "未来"], "effect": "ending" }
-  ],
-  "links": [],
-  "hints": [
-	"「さらなる」「言葉」を つなげよう",
-	"「きらきら」「明るい」「未来」を つなげよう",
-    ""
-  ],
-  "ending_text": "きらきらとした 明るい 未来を、きみは つないだ。"
+	"intro": [
+		"とっても 悲しいことが あったとき",
+		"家から 出たくなくなる",
+		"外が いやになる",
+		"きみは ずっと 泣いていた",
+		"あの子を 外に 出してあげよう",
+		"「きらきらした 明るい 未来」へ"
+	],
+
+	"palette": {
+		"gray": ["#8e8e90", "#4c4c52"],
+		"red": ["#ff8f8f", "#7a1f3d"],
+		"blue": ["#86b6ea", "#26386e"],
+		"green": ["#9fe0a0", "#1f5a4a"],
+		"purple": ["#c9a0ff", "#3d2266"],
+		"gold": ["#ffd47e", "#c8603a"],
+		"white": ["#ffffff", "#a8b8d8"]
+	},
+
+	"comment_lexicon": "言葉ごとの演出 (anim)・効果 (effect: color)・道具 (tool: reverse=逆さ / shift=ずれる)。詩はここにある言葉を並べるだけ",
+	"lexicon": {
+		"灰色": { "anim": "ash", "effect": "color", "arg": "gray" },
+		"赤い": { "anim": "paint", "effect": "color", "arg": "red" },
+		"青い": { "anim": "paint", "effect": "color", "arg": "blue" },
+		"緑の": { "anim": "paint", "effect": "color", "arg": "green" },
+		"紫の": { "anim": "paint", "effect": "color", "arg": "purple" },
+		"金色": { "anim": "paint", "effect": "color", "arg": "gold" },
+		"白い": { "anim": "paint", "effect": "color", "arg": "white" },
+		"逆さ": { "anim": "flip", "tool": "reverse" },
+		"ずれる": { "anim": "slide", "tool": "shift" },
+		"部屋": { "anim": "town" },
+		"ひとり": { "anim": "hush" },
+		"ふたり": { "anim": "hands" },
+		"涙": { "anim": "pour" },
+		"笑顔": { "anim": "smile" },
+		"ぬくもり": { "anim": "light" },
+		"つめたい": { "anim": "hush" },
+		"夜": { "anim": "hush" },
+		"朝": { "anim": "morning" },
+		"昼": { "anim": "light" },
+		"夕方": { "anim": "fall" },
+		"やさしい": { "anim": "sparkle" },
+		"声": { "anim": "speak" },
+		"夢": { "anim": "dream" },
+		"風": { "anim": "wind" },
+		"眠る": { "anim": "sleep" },
+		"起きる": { "anim": "move" },
+		"扉": { "anim": "beyond" },
+		"閉じる": { "anim": "hush" },
+		"開く": { "anim": "spread" },
+		"なくした": { "anim": "fall" },
+		"みつけた": { "anim": "star" },
+		"鍵": { "anim": "key" },
+		"光": { "anim": "light" },
+		"影": { "anim": "hush" },
+		"きらきらした": { "anim": "sparkle" },
+		"星": { "anim": "star" },
+		"暗い": { "anim": "hush" },
+		"明るい": { "anim": "bright" },
+		"過去": { "anim": "beyond" },
+		"今": { "anim": "wait" },
+		"未来": { "anim": "future" },
+		"窓": { "anim": "light" },
+		"鳥": { "anim": "bird" },
+		"歌": { "anim": "sing" },
+		"雲": { "anim": "cloud" },
+		"川": { "anim": "river" },
+		"雨": { "anim": "pour" },
+		"月": { "anim": "dream" },
+		"太陽": { "anim": "bright" }
+	},
+	"comment_opposites": "逆さ を重ねると反対の言葉になる (両方向に書く)",
+	"opposites": {
+		"涙": "笑顔", "笑顔": "涙",
+		"暗い": "明るい", "明るい": "暗い",
+		"夜": "朝", "朝": "夜",
+		"ひとり": "ふたり", "ふたり": "ひとり",
+		"つめたい": "ぬくもり", "ぬくもり": "つめたい",
+		"閉じる": "開く", "開く": "閉じる",
+		"なくした": "みつけた", "みつけた": "なくした",
+		"眠る": "起きる", "起きる": "眠る",
+		"光": "影", "影": "光",
+		"過去": "未来", "未来": "過去"
+	},
+	"comment_shifts": "ずれる を重ねると、ひとつ先の意味へずれる (輪になっている)",
+	"shifts": {
+		"朝": "昼", "昼": "夕方", "夕方": "夜", "夜": "朝",
+		"過去": "今", "今": "未来", "未来": "過去",
+		"雲": "雨", "雨": "川", "川": "雲",
+		"星": "月", "月": "太陽", "太陽": "星"
+	},
+
+	"comment_coords": "座標はすべて部屋の絵 (art/room/room.png, 300x300) のピクセル座標。y は足元 (床の上面)",
+	"start": [135, 177],
+	"nav": {
+		"nodes": {
+			"bf_l": [118, 177], "ll_bot": [125, 177], "center": [162, 177], "lr_bot": [196, 177], "bf_r": [206, 177],
+			"ll_top": [82, 129], "shelf_l": [96, 129], "ul_bot": [122, 129], "ledge_l_end": [132, 129],
+			"ul_top": [143, 105], "wardrobe": [111, 105], "bed": [88, 105], "floor_l_end": [79, 105],
+			"ur_top": [189, 106], "ur_bot": [205, 129],
+			"ledge_r_end": [199, 129], "shelf_r": [228, 129], "lr_top": [240, 129],
+			"door": [234, 106], "floor_r_end": [246, 106]
+		},
+		"edges": [
+			["bf_l", "ll_bot"], ["ll_bot", "center"], ["center", "lr_bot"], ["lr_bot", "bf_r"],
+			["ll_bot", "ll_top"],
+			["ll_top", "shelf_l"], ["shelf_l", "ul_bot"], ["ul_bot", "ledge_l_end"],
+			["ul_bot", "ul_top"],
+			["ul_top", "wardrobe"], ["wardrobe", "bed"], ["bed", "floor_l_end"],
+			["lr_bot", "lr_top"],
+			["lr_top", "shelf_r"], ["shelf_r", "ur_bot"], ["ur_bot", "ledge_r_end"],
+			["ur_bot", "ur_top"],
+			["ur_top", "door"], ["door", "floor_r_end"]
+		]
+	},
+	"spots": {
+		"shelf_left": { "points": [[96, 129]], "poem": "p2", "mark": [93, 107] },
+		"shelf_right": { "points": [[228, 129]], "poem": "p3", "mark": [228, 107] },
+		"window": { "points": [[143, 105], [189, 106]], "poem": "p4", "mark": [161, 60], "area": [128, 55, 66, 78] },
+		"bed": { "points": [[88, 105]] },
+		"door": { "points": [[234, 106]] }
+	},
+	"door_light": [227, 88, 16, 17],
+
+	"comment_start": "最初から持っている詩。poem_layout = 詩を置く場所 (画面座標, x は列の中心)。focus_poem の場面ではその詩を上の真ん中に大きく置く",
+	"start_poems": ["p1"],
+	"poem_layout": {
+		"p1": [82, 14], "p2": [82, 176],
+		"p3": [410, 14], "p4": [410, 176],
+		"focus": [240, 34]
+	},
+
+	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉",
+	"poems": [
+		{
+			"id": "p1", "title": "一",
+			"lines": [
+				["灰色", "部屋", "ひとり"],
+				["赤い", "涙", { "t": "逆さ", "visible_in": "red" }],
+				[{ "t": "ぬくもり", "visible_in": "red" }, { "t": "風", "visible_in": "green" }]
+			]
+		},
+		{
+			"id": "p2", "title": "二",
+			"lines": [
+				["青い", "夜", { "t": "ずれる", "visible_in": "blue" }],
+				["やさしい", "声", "眠る"],
+				["緑の", { "t": "夢", "visible_in": "green" }, { "t": "雲", "visible_in": "blue" }]
+			]
+		},
+		{
+			"id": "p3", "title": "三",
+			"lines": [
+				["紫の", "扉", "閉じる"],
+				["なくした", { "t": "鍵", "visible_in": "gold" }],
+				["金色", "光", { "t": "鳥", "visible_in": "purple" }]
+			]
+		},
+		{
+			"id": "p4", "title": "四",
+			"lines": [
+				["きらきらした", "星", "窓"],
+				["暗い", "過去", { "t": "歌", "visible_in": "white" }],
+				["白い", { "t": "川", "visible_in": "purple" }, { "t": "明るい", "visible_in": "white" }]
+			]
+		}
+	],
+
+	"comment_stages": "unlock = その場面で開く本棚/窓。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
+	"stages": [
+		{
+			"id": "cry",
+			"hint": "ないている。上の 詩で 笑顔を とどけよう",
+			"focus_poem": "p1",
+			"hide_room": true,
+			"can_move": false,
+			"capacity": 1,
+			"answers": [["笑顔"]],
+			"saturation": 0.0,
+			"player_anim": "cry",
+			"reaction": { "anim": "happy", "time": 1.4 }
+		},
+		{
+			"id": "sleepy",
+			"hint": "なきつかれて ねむそう。ベッドへ つれていこう",
+			"unlock": ["shelf_left"],
+			"capacity": 0,
+			"reach": "bed",
+			"saturation": 0.15,
+			"player_anim": "idle"
+		},
+		{
+			"id": "sleep",
+			"hint": "ねむってしまった。朝の 笑顔で おこそう",
+			"capacity": 2,
+			"answers": [["朝", "笑顔"], ["笑顔", "朝"]],
+			"saturation": 0.3,
+			"player_anim": "sleep",
+			"can_move": false,
+			"reaction": { "anim": "wake", "time": 1.2 }
+		},
+		{
+			"id": "door",
+			"hint": "扉が 閉じている。鍵を みつけよう",
+			"unlock": ["shelf_right"],
+			"capacity": 2,
+			"answers": [["鍵", "みつけた"], ["みつけた", "鍵"]],
+			"saturation": 0.5,
+			"player_anim": "idle",
+			"reaction": { "anim": "search", "time": 1.8 }
+		},
+		{
+			"id": "future",
+			"hint": "窓の 星が よんでいる。窓を クリック",
+			"unlock": ["window"],
+			"capacity": 3,
+			"answers": [["きらきらした", "明るい", "未来"]],
+			"saturation": 0.75,
+			"player_anim": "think",
+			"has_key": true,
+			"reaction": { "anim": "happy", "time": 1.2 }
+		}
+	],
+	"color_boost": 0.35,
+	"exit": "door",
+	"ending_text": "きらきらした 明るい 未来へ、きみは 扉を あけた。"
 }

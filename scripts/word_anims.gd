@@ -16,6 +16,7 @@ var _table: Dictionary = {}
 
 func _init() -> void:
 	_table = {
+		"smile": _smile, "key": _key, "flip": _flip, "slide": _slide,
 		"ash": _ash, "town": _town, "paint": _paint, "wind": _wind, "blow": _blow,
 		"hands": _hands, "spread": _spread, "speak": _speak, "wait": _wait,
 		"move": _move, "cloud": _cloud, "beyond": _beyond, "further": _further, "dream": _dream,
@@ -51,6 +52,40 @@ func _town(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
 
 
 ## 色: 波紋 (背景の色替えは background が受け持つ)
+## 逆さ: くるりと逆さまになって、また戻る
+func _flip(n: WordNode, fx: FxLayer, r: Rect2) -> void:
+	var tw := n.create_tween()
+	n.flip = 0.0
+	tw.tween_property(n, "flip", 1.0, 0.35).set_trans(Tween.TRANS_SINE)
+	tw.tween_interval(0.4)
+	tw.tween_property(n, "flip", 2.0, 0.35).set_trans(Tween.TRANS_SINE)
+	tw.tween_callback(func(): n.flip = 0.0)
+	fx.stars(r.grow(6.0), UIConst.HILITE_COLOR, 6)
+
+
+## ずれる: 横にずれて残像が残る
+func _slide(n: WordNode, _fx: FxLayer, _r: Rect2) -> void:
+	n.ghost_dir = -1.0
+	var tw := n.create_tween()
+	tw.tween_property(n, "anim_offset", Vector2(10, 0), 0.25).set_trans(Tween.TRANS_QUAD)
+	tw.parallel().tween_property(n, "ghost", 1.0, 0.25)
+	tw.tween_interval(0.3)
+	tw.tween_property(n, "anim_offset", Vector2.ZERO, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(n, "ghost", 0.0, 0.35)
+
+
+## 笑顔: にっこり顔がふわっと浮かぶ
+func _smile(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
+	fx.sprite("smile", r.get_center() - Vector2(4, 8), Vector2(0, -14), 1.6, UIConst.HILITE_COLOR)
+	fx.stars(r.grow(10.0), PINK, 8)
+
+
+## 鍵: 鍵がきらりと光る
+func _key(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
+	fx.sprite("key", r.get_center() - Vector2(4, 10), Vector2(0, -10), 1.4, Color("ffd47e"))
+	fx.stars(Rect2(r.get_center() + Vector2(-6, -16), Vector2(14, 8)), Color.WHITE, 4, 0.3)
+
+
 func _paint(_n: WordNode, fx: FxLayer, r: Rect2) -> void:
 	fx.ring(r.get_center(), Color.WHITE, 24, 40.0)
 

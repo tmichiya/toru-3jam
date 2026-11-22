@@ -5,6 +5,7 @@ extends Node2D
 const DISSOLVE := preload("res://shaders/dissolve.gdshader")
 const FOLLOW_SPEED := 14.0
 const HIDDEN_PROGRESS := 0.93  # 隠れている言葉: ほんの少しだけ画素がゆらいで見える
+const LENT_PROGRESS := 0.75    # 吹き出しに貸し出し中: うすく残る
 
 var uid := -1
 var text := ""
@@ -16,6 +17,9 @@ var spread := 0.0      # 文字間を広げる量 (px)
 var ghost := 0.0       # 残像の強さ 0..1
 var ghost_dir := 1.0   # 残像の向き
 var dim := 0.0         # 暗くする量 0..1
+var flip := 0.0        # 上下の回転 0 = ふつう, 1 = 逆さま (縦に裏返る)
+
+var _pending_text := ""  # 状態では変わったが、まだ見た目に反映していない言葉
 
 var _target := Vector2.ZERO
 var _pos := Vector2.ZERO
@@ -72,6 +76,46 @@ func set_status(st: String, delay: float = 0.0) -> void:
 	_tween.tween_method(_set_progress, _progress, _progress_for(st), dur)
 
 
+## 言葉が変わった。直後に morph() が呼ばれればそれで演出し、呼ばれなければ (Undo など) すぐ差し替える
+func queue_text(t: String) -> void:
+	_pending_text = t
+	_flush_pending.call_deferred()
+
+
+func _flush_pending() -> void:
+	if _pending_text != "":
+		text = _pending_text
+		_pending_text = ""
+
+
+## 逆さ (reverse): くるっと裏返って新しい言葉に / ずれる (shift): 横にずれて新しい言葉に
+func morph(style: String) -> void:
+	if _pending_text == "":
+		return
+	var to := _pending_text
+	_pending_text = ""
+	var tw := create_tween()
+	if style == "reverse":
+		flip = 0.0
+		tw.tween_property(self, "flip", 1.0, 0.35).set_trans(Tween.TRANS_SINE)
+		tw.tween_callback(func(): text = to)
+		tw.tween_property(self, "flip", 2.0, 0.35).set_trans(Tween.TRANS_SINE)
+		tw.tween_callback(func(): flip = 0.0)
+	else:
+		ghost_dir = -1.0
+		tw.tween_property(self, "anim_offset", Vector2(14, 0), 0.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.parallel().tween_property(self, "ghost", 1.0, 0.2)
+		tw.tween_callback(_swap_from_left.bind(to))
+		tw.tween_property(self, "anim_offset", Vector2.ZERO, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.parallel().tween_property(self, "ghost", 0.0, 0.3)
+	flash()
+
+
+func _swap_from_left(to: String) -> void:
+	text = to
+	anim_offset = Vector2(-14, 0)
+
+
 func move_to(p: Vector2) -> void:
 	_target = p
 
@@ -80,9 +124,17 @@ func set_highlight(v: bool) -> void:
 	_highlight = v
 
 
+## ドラッグ中は (貸し出し中でも) くっきり見せ、離したら状態の見た目に戻す
 func set_dragging(v: bool) -> void:
 	_dragging = v
 	z_index = 10 if v else 0
+	if _tween:
+		_tween.kill()
+	if v:
+		_set_progress(0.0)
+	else:
+		_tween = create_tween()
+		_tween.tween_method(_set_progress, _progress, _progress_for(status), 0.3)
 
 
 func drag_to(p: Vector2) -> void:
@@ -113,11 +165,15 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var c := UIConst.HILITE_COLOR if _highlight or _dragging else UIConst.TEXT_COLOR
 	c = c.lerp(Color(0.3, 0.3, 0.35), dim)
+	# 縦に裏返す (flip = 1 で逆さま)。文字の高さの真ん中を軸にする
+	var s := cos(PI * flip)
+	draw_set_transform(Vector2(0, UIConst.text_height() * (1.0 - s) / 2.0), 0.0, Vector2(1, s))
 	if ghost > 0.0:
 		for i in 3:
 			var a := ghost * (0.55 - i * 0.17)
 			_draw_text(Vector2(ghost_dir * (i + 1) * ghost * 9.0, 0).round(), Color(c, a))
 	_draw_text(Vector2.ZERO, c)
+	draw_set_transform(Vector2.ZERO)
 	if _highlight:
 		var y := UIConst.text_height()
 		for x in range(0, int(width()), 2):
@@ -142,6 +198,8 @@ func _progress_for(st: String) -> float:
 			return 0.0
 		"hidden":
 			return HIDDEN_PROGRESS
+		"lent":
+			return LENT_PROGRESS
 	return 1.0
 
 

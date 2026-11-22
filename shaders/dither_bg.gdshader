@@ -11,6 +11,7 @@ uniform float wipe_radius = 600.0;
 uniform float brightness = 0.0;
 uniform float rainbow = 0.0;
 uniform float levels = 7.0;
+uniform float dim = 1.0;  // 部屋の白い線が映えるよう全体を暗くする
 uniform vec2 screen_size = vec2(480.0, 270.0);
 
 const float BAYER[16] = float[16](
@@ -46,6 +47,7 @@ void fragment() {
 		float h = fract(t * 0.7 + px.x / screen_size.x * 0.25 - TIME * 0.04);
 		col = mix(col, hsv2rgb(vec3(h, 0.4, 0.97)), rainbow * 0.75);
 	}
+	col *= dim;
 	col = floor(clamp(col, 0.0, 1.0) * levels + th) / levels;
 	COLOR = vec4(col, 1.0);
 }
