@@ -4,6 +4,7 @@ extends Control
 
 const MARGIN := 8.0
 const MOVE_TELOP_DELAY := 1.0
+const INFO_TELOP_TIME := 5.0
 
 var game: Game
 var player: Player
@@ -15,6 +16,8 @@ var _title_label: Label
 var _tell_button: Button
 var _telop: Label
 var _telop_done := false
+var _info: Label
+var _info_shown: Dictionary = {}  # telop_after を出した場面
 
 
 func setup(g: Game, p: Player, v: PoemView) -> void:
@@ -49,6 +52,10 @@ func setup(g: Game, p: Player, v: PoemView) -> void:
 	_telop.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_telop.visible = false
 	p.walked_by_click.connect(_hide_move_telop)
+	_info = _make_label("", Vector2(0, 44))
+	_info.size = Vector2(UIConst.SCREEN.x, 16)
+	_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_info.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
 
 	g.state_changed.connect(_refresh)
 	g.fx_requested.connect(_on_fx)
@@ -63,6 +70,7 @@ func _refresh() -> void:
 		create_tween().tween_property(_hint_label, "visible_ratio", 1.0, 0.05 * h.length())
 	_tell_button.disabled = game.state.message().is_empty()
 	_tell_button.visible = game.capacity() > 0
+	_update_info_telop()
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
 		_title_label.text = ""
@@ -100,6 +108,23 @@ func _update_move_telop() -> void:
 	var tw := create_tween()
 	tw.tween_interval(MOVE_TELOP_DELAY)
 	tw.tween_property(_telop, "modulate:a", 1.0, 0.8)
+
+
+## 場面の詩を手に入れたとき (hint_after に変わったとき) に、telop_after を少しのあいだ出す
+func _update_info_telop() -> void:
+	var st := game.stage_def()
+	var text: String = st.get("telop_after", "")
+	var key := "%d" % game.state.d["stage"]
+	if text == "" or _info_shown.has(key) or game.hint() != str(st.get("hint_after", "")):
+		return
+	_info_shown[key] = true
+	_info.text = text
+	_info.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_interval(1.5)
+	tw.tween_property(_info, "modulate:a", 1.0, 0.6)
+	tw.tween_interval(INFO_TELOP_TIME)
+	tw.tween_property(_info, "modulate:a", 0.0, 0.8)
 
 
 func _hide_move_telop() -> void:

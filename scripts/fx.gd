@@ -50,6 +50,13 @@ func _on_fx(ev: Dictionary) -> void:
 				add(from, (to - from) * randf_range(1.2, 1.8) + Vector2(randf_range(-30, 30), randf_range(-30, 30)),
 					randf_range(0.6, 1.0), UIConst.HILITE_COLOR, {"star": i % 3 == 0, "drag": 2.0, "delay": i * 0.02})
 			ring(from, Color.WHITE, 24, 50.0)
+		"transform":
+			# 色が混ざったら、できた色の波紋
+			if ev.get("tool", "") == "mix":
+				for uid in uids:
+					var w := game.state.word_by_uid(uid)
+					if not w.is_empty():
+						ring(view.get_rect(uid).get_center(), game.palette_color(str(w["arg"]), 0), 36, 60.0)
 		"give":
 			stars(player.bubble.screen_rect().grow(4.0), UIConst.HILITE_COLOR, 6)
 		"color":
