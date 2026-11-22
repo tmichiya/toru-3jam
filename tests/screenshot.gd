@@ -12,33 +12,38 @@ func _init() -> void:
 	var main: Node = load("res://scenes/main.tscn").instantiate()
 	root.add_child(main)
 	game = main.get_node("Game")
-	await _wait(3.5)
-	_save("start")
-	game.click(_uid("両手"))
-	game.click(_uid("風"))
-	await _wait(0.35)
-	_save("anim_hands_wind")
-	game.click(_uid("青い"))
-	await _wait(2.0)
-	_save("blue")
-	var at := _find("さらなる")
-	game.drop(_uid("言葉"), at.x, _uid("さらなる"))
 	await _wait(4.0)
-	_save("reveal")
-	game.click(_uid("鳥"))
-	await _wait(0.6)
-	_save("anim_bird")
-	game.click(_uid("朝"))
-	game.click(_uid("川"))
-	await _wait(0.6)
-	_save("anim_morning_river")
-	await _wait(2.0)
-	game.click(_uid("金色"))
-	at = _find("明るい")
-	game.drop(_uid("未来"), at.x, _uid("明るい"))
-	game.drop(_uid("きらきら"), at.x, -1)
-	await _wait(6.0)
-	_save("end")
+	_save("1_cry")
+	game.give(_uid("雨が"))
+	game.tell()
+	await _wait(0.5)
+	_save("1_cry_ng")
+	game.give(_uid("笑顔を"))
+	await _wait(0.3)
+	_save("1_cry_give")
+	game.tell()
+	await _wait(5.0)
+	_save("2_sleep")
+	game.give(_uid("やさしい"))
+	game.give(_uid("声で"))
+	game.tell()
+	await _wait(14.0)
+	_save("3_door")
+	game.click(_uid("金色の"))
+	await _wait(2.5)
+	_save("3_door_gold")
+	game.give(_uid("鍵を"))
+	game.give(_uid("さがして"))
+	game.tell()
+	await _wait(5.0)
+	_save("4_future")
+	for t in ["きらきらとした", "明るい", "未来へ"]:
+		game.give(_uid(t))
+	await _wait(0.3)
+	_save("4_future_give")
+	game.tell()
+	await _wait(8.0)
+	_save("5_end")
 	quit(0)
 
 
@@ -52,16 +57,9 @@ func _save(name: String) -> void:
 	print("saved ", path)
 
 
-func _find(t: String) -> Vector2i:
-	var ls := game.state.lines()
-	for li in ls.size():
-		var ws: Array = ls[li]["words"]
-		for wi in ws.size():
-			if ws[wi]["t"] == t and not GameState.is_gap(ws[wi]):
-				return Vector2i(li, wi)
-	return Vector2i(-1, -1)
-
-
 func _uid(t: String) -> int:
-	var at := _find(t)
-	return game.state.word(at.x, at.y)["uid"]
+	for line in game.state.lines():
+		for w in line["words"]:
+			if w["t"] == t:
+				return w["uid"]
+	return -1

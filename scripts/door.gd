@@ -23,10 +23,10 @@ func setup(g: Game) -> void:
 
 
 func _apply() -> void:
-	var show := bool(game.stage_def().get("show_door", false)) or game.state.d["ended"]
-	if show != _shown:
-		_shown = show
-		create_tween().tween_property(self, "modulate:a", 1.0 if show else 0.0, 1.2)
+	var should_show: bool = bool(game.stage_def().get("show_door", false)) or bool(game.state.d["ended"])
+	if should_show != _shown:
+		_shown = should_show
+		create_tween().tween_property(self, "modulate:a", 1.0 if should_show else 0.0, 1.2)
 	var target := 1.0 if game.state.d["ended"] else 0.0
 	if not is_equal_approx(target, _open):
 		create_tween().tween_property(self, "_open", target, 1.5).set_delay(0.8 if target > 0.0 else 0.0)

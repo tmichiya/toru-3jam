@@ -9,9 +9,18 @@
 [ext_resource type="Script" path="res://scripts/input_ctrl.gd" id="7_input"]
 [ext_resource type="Script" path="res://scripts/ui.gd" id="8_ui"]
 [ext_resource type="Script" path="res://scripts/sfx.gd" id="9_sfx"]
+[ext_resource type="Script" path="res://scripts/ground.gd" id="10_ground"]
+[ext_resource type="Script" path="res://scripts/door.gd" id="11_door"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="12_player"]
+[ext_resource type="Script" path="res://scripts/world_camera.gd" id="13_camera"]
+[ext_resource type="Script" path="res://scripts/saturation.gd" id="14_sat"]
+[ext_resource type="Shader" path="res://shaders/saturation.gdshader" id="15_satshader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bg"]
 shader = ExtResource("4_bgshader")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sat"]
+shader = ExtResource("15_satshader")
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -19,29 +28,57 @@ script = ExtResource("1_main")
 [node name="Game" type="Node" parent="."]
 script = ExtResource("2_game")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="ColorRect" parent="BackgroundLayer"]
 material = SubResource("ShaderMaterial_bg")
 offset_right = 480.0
 offset_bottom = 270.0
 mouse_filter = 2
 script = ExtResource("3_bg")
 
-[node name="Poem" type="Node2D" parent="."]
+[node name="World" type="Node2D" parent="."]
+
+[node name="Ground" type="Node2D" parent="World"]
+script = ExtResource("10_ground")
+
+[node name="Door" type="Node2D" parent="World"]
+script = ExtResource("11_door")
+
+[node name="Player" parent="World" instance=ExtResource("12_player")]
+
+[node name="Camera" type="Camera2D" parent="World"]
+script = ExtResource("13_camera")
+
+[node name="PoemLayer" type="CanvasLayer" parent="."]
+
+[node name="Poem" type="Node2D" parent="PoemLayer"]
 script = ExtResource("5_poem")
 
-[node name="FX" type="Node2D" parent="."]
+[node name="FX" type="Node2D" parent="PoemLayer"]
 script = ExtResource("6_fx")
 
-[node name="Input" type="Node2D" parent="."]
+[node name="Input" type="Node2D" parent="PoemLayer"]
 script = ExtResource("7_input")
 
-[node name="UI" type="Control" parent="."]
+[node name="UI" type="Control" parent="PoemLayer"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 480.0
 offset_bottom = 270.0
 mouse_filter = 2
 script = ExtResource("8_ui")
+
+[node name="PostLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="Saturation" type="ColorRect" parent="PostLayer"]
+material = SubResource("ShaderMaterial_sat")
+offset_right = 480.0
+offset_bottom = 270.0
+mouse_filter = 2
+script = ExtResource("14_sat")
 
 [node name="SFX" type="Node" parent="."]
 script = ExtResource("9_sfx")
