@@ -136,7 +136,7 @@ func _update_info_telop() -> void:
 
 
 ## 場面のはじめに出す telops (例: はじまりの「ことばを クリックすると…」「ことばを ことばに かさねると…」)。
-## 1行ずつ、until に書いた出来事 (anim = 言葉をクリック, transform = 言葉を重ねて変える) が
+## 1行ずつ、until に書いた出来事 (anim = 言葉をクリック, transform = 言葉を重ねて変える, color = 背景の色が変わる) が
 ## 起きるまで、または場面が変わるまで出し続ける
 func _update_start_telops() -> void:
 	var st := game.stage_def()
@@ -149,7 +149,8 @@ func _update_start_telops() -> void:
 		return
 	var defs: Array = st.get("telops", [])
 	# はじまり (詩が上の真ん中にある場面) は、詩と主人公のあいだに出す
-	var y := START_TELOP_Y_FOCUS if st.has("focus_poem") else START_TELOP_Y
+	# telops_y があればその高さ (左右の詩とぶつからないところ)
+	var y := float(st.get("telops_y", START_TELOP_Y_FOCUS if st.has("focus_poem") else START_TELOP_Y))
 	for i in defs.size():
 		var key := "%s-%d" % [stage_key, i]
 		if _start_done.has(key) or _start_telops.any(func(t): return t["key"] == key):

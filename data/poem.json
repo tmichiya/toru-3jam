@@ -231,7 +231,7 @@
 		}
 	],
 
-	"comment_stages": "unlock = その場面で開く本棚/窓 (そこの詩を手に入れたら hint_after のヒントに変わる)。telops = 場面のはじめに出す案内 (until の出来事 (anim=言葉をクリック, transform=言葉を重ねて変える) が起きるまで出る)。telop_after = 詩を手に入れたとき少し出す案内。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
+	"comment_stages": "unlock = その場面で開く本棚/窓 (そこの詩を手に入れたら hint_after のヒントに変わる)。telops = 場面のはじめに出す案内 (telops_y で高さを変えられる。until の出来事 (anim=言葉をクリック, transform=言葉を重ねて変える, color=背景の色を変える) が起きるまで出る)。telop_after = 詩を手に入れたとき少し出す案内。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
 	"stages": [
 		{
 			"id": "cry",
@@ -262,6 +262,11 @@
 		{
 			"id": "sleep",
 			"hint": "夜を ずらして、朝の 笑顔で おこそう",
+			"telops": [
+				{ "text": "背景の 色が かわると、", "until": "color" },
+				{ "text": "見える ことばも かわる", "until": "color" }
+			],
+			"telops_y": 28,
 			"capacity": 2,
 			"answers": [["朝", "笑顔"], ["笑顔", "朝"]],
 			"saturation": 0.3,
