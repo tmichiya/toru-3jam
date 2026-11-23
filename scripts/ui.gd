@@ -155,6 +155,9 @@ func _update_start_telops() -> void:
 		var key := "%s-%d" % [stage_key, i]
 		if _start_done.has(key) or _start_telops.any(func(t): return t["key"] == key):
 			continue
+		# 移動の案内が残っていると重なるので、場面の案内を出すときに消す
+		if _telop.visible:
+			_hide_move_telop()
 		var label := _make_label(str(defs[i].get("text", "")), Vector2(0, y + i * START_TELOP_LINE_H))
 		label.size = Vector2(UIConst.SCREEN.x, 16)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
