@@ -231,12 +231,16 @@
 		}
 	],
 
-	"comment_stages": "unlock = その場面で開く本棚/窓 (そこの詩を手に入れたら hint_after のヒントに変わる)。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
+	"comment_stages": "unlock = その場面で開く本棚/窓 (そこの詩を手に入れたら hint_after のヒントに変わる)。telops = 場面のはじめに出す案内 (until の出来事 (anim=言葉をクリック, transform=言葉を重ねて変える) が起きるまで出る)。telop_after = 詩を手に入れたとき少し出す案内。answers = 伝えて正解になる言葉の並び。reach = そこに着くと次の場面へ",
 	"stages": [
 		{
 			"id": "cry",
 			"hint": "ないている。上の 詩で 笑顔を とどけよう",
 			"focus_poem": "p1",
+			"telops": [
+				{ "text": "ことばを クリックすると、なにかが おきる", "until": "anim" },
+				{ "text": "ことばを ことばに かさねると、かわる", "until": "transform" }
+			],
 			"hide_room": true,
 			"player_focus": { "pos": [150, 150], "scale": 3 },
 			"can_move": false,
