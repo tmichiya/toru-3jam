@@ -195,38 +195,38 @@
 		"focus": [240, 34]
 	},
 
-	"comment_poems": "1行 = 言葉の並び。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉。見える色は、たいてい別の詩 (あとで手に入る詩) の色の言葉にしてある",
+	"comment_poems": "1行 = 言葉の並び。\"~の\" のように ~ で始まるものは、つなぎの言葉 (見えるだけで、さわれない・変わらない)。{\"t\": 言葉, \"visible_in\": 色} はその色の時だけ見える言葉。見える色は、たいてい別の詩 (あとで手に入る詩) の色の言葉にしてある",
 	"poems": [
 		{
 			"id": "p1", "title": "一",
 			"lines": [
-				["灰色", "部屋", "ひとり"],
-				["赤い", "涙", "逆さ"],
-				[{ "t": "ぬくもり", "visible_in": "purple" }, { "t": "風", "visible_in": "white" }, { "t": "影", "visible_in": "black" }]
+				["灰色", "~の", "部屋", "~で", "ひとり"],
+				["赤い", "涙", "~を", "逆さ", "~に"],
+				[{ "t": "ぬくもり", "visible_in": "purple" }, "~も", { "t": "風", "visible_in": "white" }, "~も", { "t": "影", "visible_in": "black" }, "~も"]
 			]
 		},
 		{
 			"id": "p2", "title": "二",
 			"lines": [
-				["青い", "夜", { "t": "ずれる", "visible_in": "red" }],
-				["やさしい", "声", "眠る"],
-				["緑の", { "t": "夢", "visible_in": "gold" }, { "t": "明るい", "visible_in": "lightblue" }]
+				["青い", "夜", "~が", { "t": "ずれる", "visible_in": "red" }],
+				["やさしい", "声", "~で", "眠る"],
+				["緑の", { "t": "夢", "visible_in": "gold" }, "~は", { "t": "明るい", "visible_in": "lightblue" }]
 			]
 		},
 		{
 			"id": "p3", "title": "三",
 			"lines": [
-				["紫の", "扉", "閉じる"],
-				["なくした", { "t": "鍵", "visible_in": "green" }],
-				["金色", "光", { "t": "鳥", "visible_in": "white" }]
+				["紫の", "扉", "~が", "閉じる"],
+				["なくした", { "t": "鍵", "visible_in": "green" }, "~を"],
+				["金色", "~の", "光", "~と", { "t": "鳥", "visible_in": "white" }]
 			]
 		},
 		{
 			"id": "p4", "title": "四",
 			"lines": [
-				[{ "t": "きらきらした", "visible_in": "pink" }, "星", "窓"],
-				[{ "t": "暗い", "visible_in": "orange" }, { "t": "過去", "visible_in": "black" }, { "t": "歌", "visible_in": "red" }],
-				["白い", { "t": "川", "visible_in": "blue" }]
+				[{ "t": "きらきらした", "visible_in": "pink" }, "星", "~の", "窓"],
+				[{ "t": "暗い", "visible_in": "orange" }, { "t": "過去", "visible_in": "black" }, "~の", { "t": "歌", "visible_in": "red" }],
+				["白い", { "t": "川", "visible_in": "blue" }, "~へ"]
 			]
 		}
 	],
