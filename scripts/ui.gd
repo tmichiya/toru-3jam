@@ -5,6 +5,9 @@ extends Control
 const MARGIN := 8.0
 const MOVE_TELOP_DELAY := 1.0
 const INFO_TELOP_TIME := 5.0
+const START_TELOP_Y := 44.0
+const START_TELOP_Y_FOCUS := 104.0
+const START_TELOP_LINE_H := 16.0
 
 var game: Game
 var player: Player
@@ -18,6 +21,8 @@ var _telop: Label
 var _telop_done := false
 var _info: Label
 var _info_shown: Dictionary = {}  # telop_after を出した場面
+var _start_telops: Array = []    # 出している場面はじめの案内 {key, stage, until, label}
+var _start_done: Dictionary = {}  # 出し終えた案内の key
 
 
 func setup(g: Game, p: Player, v: PoemView) -> void:
@@ -71,6 +76,7 @@ func _refresh() -> void:
 	_tell_button.disabled = game.state.message().is_empty()
 	_tell_button.visible = game.capacity() > 0
 	_update_info_telop()
+	_update_start_telops()
 	if not game.state.d["ended"]:
 		_ending_label.text = ""
 		_title_label.text = ""
@@ -85,6 +91,8 @@ func _process(_delta: float) -> void:
 
 
 func _on_fx(ev: Dictionary) -> void:
+	# 案内に書いた操作を一度やってみたら、その案内はもういらない
+	_on_start_telop_event(ev["kind"])
 	if ev["kind"] == "ending":
 		# 詩が消えていく中、上に大きく題、そのあと下に一文
 		_title_label.text = game.poem.get("ending_title", "")
@@ -125,6 +133,50 @@ func _update_info_telop() -> void:
 	tw.tween_property(_info, "modulate:a", 1.0, 0.6)
 	tw.tween_interval(INFO_TELOP_TIME)
 	tw.tween_property(_info, "modulate:a", 0.0, 0.8)
+
+
+## 場面のはじめに出す telops (例: はじまりの「ことばを クリックすると…」「ことばを ことばに かさねると…」)。
+## 1行ずつ、until に書いた出来事 (anim = 言葉をクリック, transform = 言葉を重ねて変える) が
+## 起きるまで、または場面が変わるまで出し続ける
+func _update_start_telops() -> void:
+	var st := game.stage_def()
+	var stage_key := "%d" % game.state.d["stage"]
+	# 場面が変わったら、前の場面の案内は消す
+	for t in _start_telops.duplicate():
+		if t["stage"] != stage_key or game.state.d["ended"]:
+			_hide_start_telop(t)
+	if game.state.d["ended"]:
+		return
+	var defs: Array = st.get("telops", [])
+	# はじまり (詩が上の真ん中にある場面) は、詩と主人公のあいだに出す
+	var y := START_TELOP_Y_FOCUS if st.has("focus_poem") else START_TELOP_Y
+	for i in defs.size():
+		var key := "%s-%d" % [stage_key, i]
+		if _start_done.has(key) or _start_telops.any(func(t): return t["key"] == key):
+			continue
+		var label := _make_label(str(defs[i].get("text", "")), Vector2(0, y + i * START_TELOP_LINE_H))
+		label.size = Vector2(UIConst.SCREEN.x, 16)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_color_override("font_color", UIConst.HILITE_COLOR)
+		label.modulate.a = 0.0
+		create_tween().tween_property(label, "modulate:a", 1.0, 0.8)
+		_start_telops.append({"key": key, "stage": stage_key, "until": str(defs[i].get("until", "")), "label": label})
+
+
+## kind の出来事が起きたら、それを待っていた案内を消す
+func _on_start_telop_event(kind: String) -> void:
+	for t in _start_telops.duplicate():
+		if t["until"] == kind:
+			_hide_start_telop(t)
+
+
+func _hide_start_telop(t: Dictionary) -> void:
+	_start_telops.erase(t)
+	_start_done[t["key"]] = true
+	var label: Label = t["label"]
+	var tw := create_tween()
+	tw.tween_property(label, "modulate:a", 0.0, 0.6)
+	tw.tween_callback(label.queue_free)
 
 
 func _hide_move_telop() -> void:

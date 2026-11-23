@@ -27,7 +27,7 @@ static func from_poem(poem: Dictionary) -> GameState:
 		for i in p["lines"].size():
 			var words: Array = []
 			for w in p["lines"][i]:
-				var src: Dictionary = w if w is Dictionary else {"t": w}
+				var src: Dictionary = w if w is Dictionary else _parse_token(str(w))
 				words.append(make_word(s.new_uid(), src, lexicon))
 			lines.append({"id": "%s-%d" % [p["id"], i], "words": words})
 		s.d["poems"][p["id"]] = {"title": p.get("title", p["id"]), "lines": lines}
@@ -40,6 +40,7 @@ static func make_word(uid: int, src: Dictionary, lexicon: Dictionary) -> Diction
 		"uid": uid,
 		"visible_in": src.get("visible_in", ""),
 		"in_bubble": false,
+		"joint": bool(src.get("joint", false)),  # つなぎの言葉 (の・へ・が…): 見えるだけで、さわれない
 	}
 	set_text(w, src.get("t", ""), lexicon)
 	return w
@@ -96,7 +97,14 @@ func can_see(w: Dictionary) -> bool:
 
 ## 手に入れた詩の中にあって、さわれる (見えていて、貸し出し中でない) か
 func is_present(w: Dictionary) -> bool:
-	return not w["in_bubble"] and can_see(w) and poem_of(w["uid"]) in got()
+	return not w["joint"] and not w["in_bubble"] and can_see(w) and poem_of(w["uid"]) in got()
+
+
+## 詩の中の文字列ひとつ。"~の" のように ~ で始まるものは、つなぎの言葉
+static func _parse_token(s: String) -> Dictionary:
+	if s.begins_with("~"):
+		return {"t": s.substr(1), "joint": true}
+	return {"t": s}
 
 
 func word_by_uid(uid: int) -> Dictionary:

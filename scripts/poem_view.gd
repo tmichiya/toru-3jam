@@ -8,6 +8,7 @@ extends Node2D
 const LINE_H := 16.0
 const TITLE_H := 13.0
 const WORD_GAP := 8.0
+const JOINT_GAP := 1.0  # つなぎの言葉と前の言葉のすきま
 const HIT_PAD := 4.0  # 言葉の当たり判定を見た目より広げる (指でもつかみやすく)
 const TYPE_DELAY_PER_WORD := 0.2
 const TYPE_DELAY_PER_LINE := 0.5
@@ -63,16 +64,20 @@ func _origin_of(pid: String, focus: String) -> Vector2:
 
 
 func _layout_line(s: GameState, cx: float, y: float, li: int, ws: Array, alive: Dictionary) -> void:
+	# つなぎの言葉 (の・へ・が…) は前の言葉にくっつける
 	var widths: Array = []
-	var total := WORD_GAP * maxi(0, ws.size() - 1)
-	for w in ws:
-		var ww := UIConst.text_width(w["t"])
+	var total := 0.0
+	for wi in ws.size():
+		var ww := UIConst.text_width(ws[wi]["t"])
 		widths.append(ww)
-		total += ww
+		total += ww + (_gap_before(ws, wi) if wi > 0 else 0.0)
 	var x := roundf(cx - total / 2.0)
+	var prev_status := "visible"
 	for wi in ws.size():
 		var w: Dictionary = ws[wi]
 		var uid: int = w["uid"]
+		if wi > 0:
+			x += _gap_before(ws, wi)
 		alive[uid] = true
 		var rect := Rect2(x, y, widths[wi], UIConst.text_height())
 		_rects[uid] = rect
@@ -89,8 +94,19 @@ func _layout_line(s: GameState, cx: float, y: float, li: int, ws: Array, alive: 
 			node.queue_text(w["t"])
 		if uid != _drag_uid:
 			node.move_to(rect.position)  # 場所が変わったら (はじまり → 左上) すーっと動く
-		node.set_status(_status_of(s, w), delay)
-		x += widths[wi] + WORD_GAP
+		var status := _status_of(s, w)
+		if w["joint"]:
+			# つなぎの言葉は、前の言葉が色で隠れている間は一緒に隠れる
+			status = "hidden" if prev_status == "hidden" else "visible"
+			node.joint = true
+		else:
+			prev_status = status
+		node.set_status(status, delay)
+		x += widths[wi]
+
+
+func _gap_before(ws: Array, wi: int) -> float:
+	return JOINT_GAP if ws[wi]["joint"] else WORD_GAP
 
 
 ## 各詩の題 (一 二 三 四)
