@@ -6,6 +6,7 @@ const DISSOLVE := preload("res://shaders/dissolve.gdshader")
 const FOLLOW_SPEED := 14.0
 const HIDDEN_PROGRESS := 0.93  # 隠れている言葉: ほんの少しだけ画素がゆらいで見える
 const LENT_PROGRESS := 0.75    # 吹き出しに貸し出し中: うすく残る
+const JOINT_ALPHA := 0.7       # つなぎの言葉の濃さ
 
 var uid := -1
 var text := ""
@@ -17,6 +18,7 @@ var spread := 0.0      # 文字間を広げる量 (px)
 var ghost := 0.0       # 残像の強さ 0..1
 var ghost_dir := 1.0   # 残像の向き
 var dim := 0.0         # 暗くする量 0..1
+var joint := false     # つなぎの言葉 (の・へ・が…) は少し控えめな色で描く
 var flip := 0.0        # 上下の回転 0 = ふつう, 1 = 逆さま (縦に裏返る)
 
 var _pending_text := ""  # 状態では変わったが、まだ見た目に反映していない言葉
@@ -164,6 +166,8 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var c := UIConst.HILITE_COLOR if _highlight or _dragging else UIConst.TEXT_COLOR
+	if joint:
+		c = Color(c, JOINT_ALPHA)
 	c = c.lerp(Color(0.3, 0.3, 0.35), dim)
 	# 縦に裏返す (flip = 1 で逆さま)。文字の高さの真ん中を軸にする
 	var s := cos(PI * flip)
